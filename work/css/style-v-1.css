@@ -586,7 +586,7 @@ figure .grid img {
 .connect-icon {
   float: left;
   height: 20px;
-  margin: 0 20px;
+  margin: 0 20px 20px 0;
   width: 20px;
   -webkit-transition:opacity .1s ease-in;
   -moz-transition:opacity .1s ease-in;
