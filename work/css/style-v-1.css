@@ -75,6 +75,16 @@ body {
   font-weight: 400;
   font-size: 17px;
   line-height: 1.5em;
+  background: -webkit-radial-gradient(circle, DarkKhaki, Khaki, DarkGoldenRod);
+  background: -moz-radial-gradient(circle, DarkKhaki, Khaki, DarkGoldenRod);
+  background: -o-radial-gradient(circle, DarkKhaki, Khaki, DarkGoldenRod);
+  background: radial-gradient(circle, DarkKhaki, Khaki, DarkGoldenRod);
+  background-size: 200% 200%;
+  -webkit-animation: gradient 60s ease infinite;
+  -moz-animation: gradient 60s ease infinite;
+  -o-animation: gradient 60s ease infinite;
+  animation: gradient 60s ease infinite;
+  height: 100vh;
 }
 
 h1,
@@ -1402,5 +1412,17 @@ a.pswp__share--download:hover {
   .gallery figure {
     height: 140px;
     width: 140px;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
