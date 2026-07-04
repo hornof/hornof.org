@@ -1,0 +1,14 @@
+{
+  "name": "hornof-org",
+  "version": "1.0.0",
+  "description": "hornof.org — static personal site + archives, Cloudflare Pages",
+  "private": true,
+  "scripts": {
+    "serve": "node server.js",
+    "test": "playwright test",
+    "test:install": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

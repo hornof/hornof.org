@@ -10,7 +10,7 @@
 
 ## Features (ranked)
 
-### F1 — [ ] Port the current site + archives
+### F1 — [x] Port the current site + archives
 Fetch the live hornof.org (current one-pager) and its archive versions; commit verbatim into the repo layout. Cloudflare Pages config ready (`wrangler.toml` or Pages defaults documented in README).
 *Accept:* local serve renders identically to production; archive paths `/.2013/ /.2024/ /.2025/` load; Playwright test proves all four render + archive links resolve.
 

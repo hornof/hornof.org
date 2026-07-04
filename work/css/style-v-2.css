@@ -1,0 +1,171 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: url('/work/img/DALL-E Panoramic.webp') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed; /* Ensure the background image stays fixed during scrolling */
+    animation: zoomBackground 20s infinite alternate;
+}
+
+@keyframes zoomBackground {
+    from {
+        background-size: 100%;
+    }
+    to {
+        background-size: 110%;
+    }
+}
+
+.content {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -35%);
+    max-width: 600px;
+    min-width: 300px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+    font-family: 'Sentinel A', 'Sentinel B', Garamond, Baskerville, Hoefler Text, serif, 'Times New Roman', Times;
+    line-height: 1.6;
+    box-shadow: -20px -20px 20px rgba(90,56, 37, 0.4);
+    color: #5a3825; /* Dark brown color */
+    margin: 20px auto; /* Center the box with equal margins */
+}
+
+.content h1 {
+    font-size: 22px;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.content h3 {
+    font-size: 20px;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+.content .myname {
+    font-size: 18px !important;
+    font-weight: normal;
+    margin: 0 0 !important; /* Add top and bottom margins */
+}
+
+.content .mytitle {
+    font-size: 24px !important;
+    font-weight: normal;
+    margin: 20px 0 !important; /* Add top and bottom margins */
+}
+
+.content p {
+    font-size: 17px;
+    margin: 5px 0;
+}
+
+p {
+    text-indent: -1em; /* Negative indent for the first line */
+    padding-left: 1em; /* Indent for the wrapped lines */
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.social-icons img {
+    width: 20px; /* Adjusted width */
+    height: 20px; /* Adjusted height */
+    margin: 0 10px; /* Default spacing for narrow screens */
+    transition: transform 0.3s ease;
+}
+
+.social-icons img:hover {
+    transform: scale(1.2);
+}
+
+/* Media queries for responsive design */
+@media (min-width: 769px) {
+    .social-icons img {
+        margin: 0 20px; /* Increased spacing for wider screens */
+    }
+    body {
+        background-size: cover;
+        animation: none; /* Disable animation for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        margin: 10px auto; /* Smaller margin for medium screens, centered */
+        max-width: calc(100% - 20px); /* Ensure the box doesn't shrink too early */
+    }
+
+    .social-icons {
+        justify-content: space-between; /* Spread icons to the edges */
+    }
+
+    .social-icons img {
+        margin: 5px; /* Remove margins for small screens */
+    }
+
+    body {
+        background-size: cover;
+        animation: none; /* Disable animation for medium screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        margin: 5px auto; /* Even smaller margin for small screens, centered */
+        max-width: calc(100% - 10px); /* Decrease width only when margins are very small */
+    }
+
+    .social-icons {
+        justify-content: space-between; /* Spread icons to the edges */
+    }
+
+    .social-icons img {
+        margin: 5px; /* Remove margins for small screens */
+    }
+
+    body {
+        background-size: cover;
+        animation: none; /* Disable animation for small screens */
+    }
+}
+
+#message-container {
+    position: absolute;
+    bottom: 10%; /* Position near the bottom */
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Sentinel A', 'Sentinel B', Garamond, Baskerville, Hoefler Text, serif, 'Times New Roman', Times;
+    font-size: 16px; /* Smaller font size */
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 0.15em solid orange;
+    animation: typing 3.5s steps(40, end);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: -10px -10px 10px rgba(90, 56, 37, 0.4);
+    color: #5a3825; /* Dark brown color */
+    width: 0; /* Start with width 0 */
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 36ch; } /* Adjust width to match the length of the message */
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: orange; }
+}
