@@ -1,0 +1,8 @@
+# Cloudflare Pages config for hornof.org.
+# No build step: the repo root IS the deploy output (plain HTML/CSS/JS).
+name = "hornof-org"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "."
+
+# Production branch = main; every PR gets a preview deploy automatically.
+# See README.md → "Deploy (Cloudflare Pages)" for the dot-directory archive caveat.
