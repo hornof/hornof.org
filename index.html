@@ -44,6 +44,7 @@
                 <a href="#publications">Publications</a>
                 <a href="#talks">Talks</a>
                 <a href="#contact">Contact</a>
+                <a href="projects.html" class="nav-page">Projects</a>
             </nav>
 
             <nav class="social" aria-label="Social profiles">
@@ -113,11 +114,34 @@
             <section id="contact">
                 <h2>Contact</h2>
                 <p>SF Bay Area. Email <a href="mailto:luke@hornof.org">luke@hornof.org</a>, or find me on the profiles linked in the sidebar.</p>
+
+                <!-- F10: SoundCloud, click-to-load. The player iframe is only
+                     injected on interaction, so it never blocks first paint or
+                     touches an external host on load (protects the perf budget). -->
+                <div class="soundcloud" data-sc-url="https://soundcloud.com/luke-hornof">
+                    <button type="button" class="sc-play" aria-label="Load the SoundCloud player for Luke Hornof">
+                        <span class="sc-play-icon" aria-hidden="true">&#9654;</span>
+                        <span>Listen on SoundCloud</span>
+                    </button>
+                    <noscript><a href="https://soundcloud.com/luke-hornof">Luke Hornof on SoundCloud</a></noscript>
+                </div>
             </section>
 
             <!-- F8: subtle colophon link to the transparency page. -->
             <footer class="colophon-link">
                 <a href="built-with.html">How this site was built &rarr;</a>
+
+                <!-- F9: Breton Easter egg — a faint fleur-de-lis reveals a nod to
+                     Brittany, France. Same subtle register as the Tardis. -->
+                <span class="breton">
+                    <button type="button" class="breton-toggle" aria-expanded="false" aria-controls="breton-panel" aria-label="A small nod to Brittany, France">
+                        <span aria-hidden="true">&#9884;</span>
+                    </button>
+                    <span id="breton-panel" class="breton-panel" hidden>
+                        <span class="gwenn-ha-du" role="img" aria-label="Gwenn ha Du, the flag of Brittany"></span>
+                        <span class="breton-text" lang="br">Breizh atav — <span lang="en">a corner of Brittany, France.</span></span>
+                    </span>
+                </span>
             </footer>
         </main>
     </div>

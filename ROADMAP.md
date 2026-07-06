@@ -46,10 +46,26 @@ A control that switches between the earth-tone (light) palette and a dark varian
 A subtle section/page documenting how the site was built — the agentic engineering loop, the stack (plain HTML/CSS/JS on Cloudflare Pages), and that it ships PR-per-feature with Playwright gates. Credibility piece, not padding.
 *Accept:* reachable from the page; renders real copy (no lorem ipsum); every external link it carries resolves live (link-liveness test); no Lighthouse regression.
 
-### F9 — [ ] France/Brittany Easter egg
+### F9 — [x] France/Brittany Easter egg
 A subtle flourish in the same Easter-egg register as the Tardis (not primary nav) — a nod to France/Brittany. Hidden until invoked; keyboard accessible.
 *Accept:* not visible on load; invoking it (click or keyboard) reveals it; Escape/dismiss works; keyboard operable; no Lighthouse regression. Playwright nav test.
 
-### F10 — [ ] SoundCloud now-playing embed
+### F10 — [x] SoundCloud now-playing embed
 Surface Luke's SoundCloud from the music thread. The embed is an external iframe, so it must be lazy/deferred and must not regress the F3 perf budget.
 *Accept:* embed present and pointing at Luke's SoundCloud; loaded with `loading="lazy"` (or click-to-load) so it doesn't block first paint; Lighthouse perf ≥95 and a11y ≥95 still hold with it on the page. Playwright proves presence + budget.
+
+## Phase 5 — Projects wall
+
+> Approved PRD + eng doc: `Claude-Cowork/projects/fable-5/loop/{prd,engdoc}-projects-wall.md` (gates 1+2 cleared by Luke 2026-07-06). A growing showcase where each build documents itself. Static, in-architecture (no framework, no build step); entries are data (`content/projects/projects.json`) inlined into the page and rendered by vanilla JS. Lighthouse ≥95 continues.
+
+### F11 — [x] Projects wall (page + render + nav)
+`projects.html` in the existing shell (F8 head: theme resolver + stylesheet), reachable from a new "Projects" sidebar nav link. Entries live in `content/projects/projects.json`, inlined into the page as a `<script type="application/json">` block and rendered to cards by `renderProjects()` in `main.js` (no `fetch`). Each card: title · blurb · date · links · a "how it was built" line from the entry's `build` metadata.
+*Accept:* nav link navigates to the page; every entry in the data renders as a card with its fields; renders at 375px and 1440px; Lighthouse ≥95 perf + a11y; no placeholder text. Playwright proves render + nav + fields + viewport.
+
+### F12 — [ ] Dogfood entry (hornof.org itself)
+The first real card documents this build: the agentic loop, plain HTML/CSS/JS on Cloudflare Pages, F1–F10, PR-per-feature, tests-first + Lighthouse gates, Claude Code, and a cost/effort note — real, current facts only.
+*Accept:* every fact real (no invented metrics); every entry link resolves live (link-liveness test); build-note names the real stack + process. **Luke sign-off on the entry copy in the PR is part of done.**
+
+### F13 — [x] Self-documenting convention
+`content/projects/README.md`: the entry schema + a close-on-merge step so the next loop build appends its own card. v1 is a documented convention + a worked second-entry example, not an autonomous writer.
+*Accept:* schema documented in the repo; a second entry can be added by following it without touching layout code (a fixture entry renders with no layout diff); the close-on-merge step is written into the loop's close checklist.
