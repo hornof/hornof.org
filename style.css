@@ -321,6 +321,111 @@ body {
     margin-top: 2rem;
 }
 
+/* ---- Projects wall (F11) ---- */
+.projects {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+}
+
+.projects h1 {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1.7rem;
+    font-weight: normal;
+}
+
+.projects-intro {
+    margin: 0 0 2.5rem;
+    font-size: 1.1rem;
+    max-width: 34rem;
+    color: var(--ink-soft);
+}
+
+.projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.project-card {
+    padding: 1.5rem 1.6rem;
+    background: var(--card);
+    border: 1px solid var(--ink-soft);
+    border-radius: 10px;
+}
+
+.project-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.project-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: normal;
+}
+
+.project-date {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.project-blurb {
+    margin: 0.6rem 0 0;
+    font-size: 1.05rem;
+}
+
+.project-build {
+    margin: 0.9rem 0 0;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+}
+
+.project-build-label {
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.project-cost {
+    display: block;
+    margin-top: 0.3rem;
+    font-style: italic;
+}
+
+.project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 1.1rem;
+}
+
+.project-links a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--ink-soft);
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+}
+
+.project-links a:hover,
+.project-links a:focus-visible {
+    border-color: var(--ink);
+}
+
+.project-links a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
 /* ---- SoundCloud (F10): click-to-load player ---- */
 .soundcloud {
     margin-top: 1.75rem;

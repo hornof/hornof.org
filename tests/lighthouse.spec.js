@@ -15,56 +15,68 @@ const os = require("os");
 const path = require("path");
 
 const PORT = process.env.PORT || 8788;
-const URL = `http://localhost:${PORT}/`;
+const BASE = `http://localhost:${PORT}`;
 const THRESHOLDS = { performance: 95, accessibility: 95 };
 
-test.describe("F3: Lighthouse budgets", () => {
+// Run a real Lighthouse audit (child process — see header) and return the scores.
+function audit(pageUrl, tag) {
+  const outPath = path.join(os.tmpdir(), `lh-${tag}-${process.pid}.json`);
+  const lhBin = require.resolve("lighthouse/cli/index.js");
+
+  const result = spawnSync(
+    process.execPath,
+    [
+      lhBin,
+      pageUrl,
+      "--only-categories=performance,accessibility",
+      "--output=json",
+      `--output-path=${outPath}`,
+      "--chrome-flags=--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage",
+      "--quiet",
+    ],
+    {
+      encoding: "utf-8",
+      timeout: 150_000,
+      // Point chrome-launcher at the Chromium Playwright already installed,
+      // so this works in CI without a separate system Chrome.
+      env: { ...process.env, CHROME_PATH: chromium.executablePath() },
+    }
+  );
+
+  if (result.status !== 0) {
+    throw new Error(
+      `Lighthouse CLI failed (status ${result.status}):\n${result.stderr || result.stdout}`
+    );
+  }
+
+  const report = JSON.parse(fs.readFileSync(outPath, "utf-8"));
+  fs.rmSync(outPath, { force: true });
+  return {
+    performance: Math.round(report.categories.performance.score * 100),
+    accessibility: Math.round(report.categories.accessibility.score * 100),
+  };
+}
+
+// F3 gates the root page; F11 extends the same budget to the Projects wall.
+const PAGES = [
+  { tag: "root", path: "/", label: "root page" },
+  { tag: "projects", path: "/projects.html", label: "projects wall" },
+];
+
+test.describe("F3/F11: Lighthouse budgets", () => {
   test.setTimeout(180_000);
 
-  test("root page scores ≥95 performance and ≥95 accessibility", () => {
-    const outPath = path.join(os.tmpdir(), `lh-root-${process.pid}.json`);
-    const lhBin = require.resolve("lighthouse/cli/index.js");
-
-    const result = spawnSync(
-      process.execPath,
-      [
-        lhBin,
-        URL,
-        "--only-categories=performance,accessibility",
-        "--output=json",
-        `--output-path=${outPath}`,
-        "--chrome-flags=--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage",
-        "--quiet",
-      ],
-      {
-        encoding: "utf-8",
-        timeout: 150_000,
-        // Point chrome-launcher at the Chromium Playwright already installed,
-        // so this works in CI without a separate system Chrome.
-        env: { ...process.env, CHROME_PATH: chromium.executablePath() },
-      }
-    );
-
-    if (result.status !== 0) {
-      throw new Error(
-        `Lighthouse CLI failed (status ${result.status}):\n${result.stderr || result.stdout}`
+  for (const p of PAGES) {
+    test(`${p.label} scores ≥95 performance and ≥95 accessibility`, () => {
+      const scores = audit(BASE + p.path, p.tag);
+      console.log(`Lighthouse ${p.label}: ${JSON.stringify(scores)}`);
+      expect(scores.performance, `${p.label} performance`).toBeGreaterThanOrEqual(
+        THRESHOLDS.performance
       );
-    }
-
-    const report = JSON.parse(fs.readFileSync(outPath, "utf-8"));
-    fs.rmSync(outPath, { force: true });
-
-    const scores = {
-      performance: Math.round(report.categories.performance.score * 100),
-      accessibility: Math.round(report.categories.accessibility.score * 100),
-    };
-    console.log(`Lighthouse scores: ${JSON.stringify(scores)}`);
-
-    expect(scores.performance, "performance score").toBeGreaterThanOrEqual(
-      THRESHOLDS.performance
-    );
-    expect(scores.accessibility, "accessibility score").toBeGreaterThanOrEqual(
-      THRESHOLDS.accessibility
-    );
-  });
+      expect(
+        scores.accessibility,
+        `${p.label} accessibility`
+      ).toBeGreaterThanOrEqual(THRESHOLDS.accessibility);
+    });
+  }
 });
