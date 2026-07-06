@@ -5,6 +5,7 @@
 // no placeholder text. (Lighthouse budget is gated by lighthouse.spec.js, and
 // extended to the projects page here.)
 const { test, expect, request } = require("@playwright/test");
+const fs = require("fs");
 
 test.describe("F11: reachable from the site", () => {
   test('a "Projects" nav link points at the wall', async ({ page }) => {
@@ -168,5 +169,65 @@ test.describe("F12: dogfood entry", () => {
     }
     await ctx.dispose();
     test.skip(!reachedAny, "no host reachable — offline");
+  });
+});
+
+// F13 — Self-documenting convention: entries are pure data, so a new build adds
+// itself by appending one object; the schema is documented; source stays in sync.
+test.describe("F13: self-documenting convention", () => {
+  test("a new entry in the data alone renders a card — no layout code touched", async ({
+    page,
+  }) => {
+    const fixture = {
+      slug: "fixture-demo",
+      title: "Fixture Build",
+      blurb: "A second entry, added as data only, proving the wall is data-driven.",
+      date: "2026-08",
+      links: [{ label: "Home", href: "/" }],
+      build: { stack: "Test stack", agents: "Claude Code", tests: 1 },
+    };
+    // Intercept the page and append one entry to the inlined JSON — nothing else.
+    await page.route("**/projects.html", async (route) => {
+      const resp = await route.fetch();
+      const html = (await resp.text()).replace(
+        /(<script type="application\/json" id="projects-data">)([\s\S]*?)(<\/script>)/,
+        (_m, open, json, close) => {
+          const arr = JSON.parse(json);
+          arr.push(fixture);
+          return open + "\n" + JSON.stringify(arr, null, 2) + "\n" + close;
+        }
+      );
+      await route.fulfill({ response: resp, body: html, contentType: "text/html" });
+    });
+
+    await page.goto("/projects.html");
+    await expect(page.locator(".project-card")).toHaveCount(2);
+    const card = page.locator('.project-card[data-slug="fixture-demo"]');
+    await expect(card).toContainText("Fixture Build");
+    await expect(card.locator(".project-build")).toContainText("Test stack");
+    await expect(card.locator('.project-links a[href="/"]')).toHaveCount(1);
+  });
+
+  test("the entry schema + close-on-merge convention is documented", () => {
+    const readme = fs
+      .readFileSync("content/projects/README.md", "utf-8")
+      .toLowerCase();
+    for (const field of ["slug", "title", "blurb", "date", "links", "build"]) {
+      expect(readme, `documents "${field}"`).toContain(field);
+    }
+    expect(readme, "documents the close-on-merge step").toMatch(/close-on-merge|on merge/);
+  });
+
+  test("the source JSON and the inlined page data stay in sync", () => {
+    const src = JSON.stringify(
+      JSON.parse(fs.readFileSync("content/projects/projects.json", "utf-8"))
+    );
+    const html = fs.readFileSync("projects.html", "utf-8");
+    const m = html.match(
+      /<script type="application\/json" id="projects-data">([\s\S]*?)<\/script>/
+    );
+    expect(m, "inlined data block present").toBeTruthy();
+    const inlined = JSON.stringify(JSON.parse(m[1]));
+    expect(inlined, "inlined data == content/projects/projects.json").toBe(src);
   });
 });

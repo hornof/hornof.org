@@ -66,6 +66,6 @@ Surface Luke's SoundCloud from the music thread. The embed is an external iframe
 The first real card documents this build: the agentic loop, plain HTML/CSS/JS on Cloudflare Pages, F1–F10, PR-per-feature, tests-first + Lighthouse gates, Claude Code, and a cost/effort note — real, current facts only.
 *Accept:* every fact real (no invented metrics); every entry link resolves live (link-liveness test); build-note names the real stack + process. **Luke sign-off on the entry copy in the PR is part of done.**
 
-### F13 — [ ] Self-documenting convention
+### F13 — [x] Self-documenting convention
 `content/projects/README.md`: the entry schema + a close-on-merge step so the next loop build appends its own card. v1 is a documented convention + a worked second-entry example, not an autonomous writer.
 *Accept:* schema documented in the repo; a second entry can be added by following it without touching layout code (a fixture entry renders with no layout diff); the close-on-merge step is written into the loop's close checklist.
