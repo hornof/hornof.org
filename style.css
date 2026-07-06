@@ -7,7 +7,20 @@
     --cream: #f2ebe0;      /* light earth tone (background top) */
     --tan: #cbb391;        /* warm earth tone (background bottom) */
     --card: rgba(255, 255, 255, 0.92);
+    --icon-filter: none;   /* social icons: brown PNGs, untouched in light mode */
     --serif: Garamond, Baskerville, "Hoefler Text", "Times New Roman", Times, serif;
+}
+
+/* F7: dark variant — same earth family, inverted. Only colour values change; the
+   whole skin stays isolated in this file. data-theme is set before paint. */
+[data-theme="dark"] {
+    --ink: #ece0cb;        /* warm cream ink on dark ground */
+    --ink-soft: rgba(236, 224, 203, 0.6);
+    --cream: #2a1d12;      /* deep roasted brown (background top) */
+    --tan: #17100a;        /* near-black brown (background bottom) */
+    --card: rgba(42, 29, 18, 0.95);
+    /* Recolour the brown social PNGs to the cream ink so they stay legible. */
+    --icon-filter: brightness(0) invert(0.88) sepia(0.25);
 }
 
 * {
@@ -151,6 +164,7 @@ body {
 .social img {
     width: 24px;
     height: 24px;
+    filter: var(--icon-filter);
     transition: transform 0.2s ease;
 }
 
@@ -230,6 +244,44 @@ body {
 .more {
     margin-top: 1.25rem;
     font-size: 1rem;
+}
+
+/* ---- Theme toggle (F7) — top-right corner control ---- */
+.theme-toggle {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 10;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--ink-soft);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+    opacity: 1;
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.theme-toggle-icon::before {
+    content: "\263E"; /* ☾ crescent — "switch to dark" while in light mode */
+}
+
+[data-theme="dark"] .theme-toggle-icon::before {
+    content: "\2600"; /* ☀ sun — "switch to light" while in dark mode */
 }
 
 /* ---- Tardis time-machine (F4) — subtle corner control ---- */
