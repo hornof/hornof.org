@@ -14,7 +14,7 @@
 Fetch the live hornof.org (current one-pager) and its archive versions; commit verbatim into the repo layout. Cloudflare Pages config ready (`wrangler.toml` or Pages defaults documented in README).
 *Accept:* local serve renders identically to production; archive paths `/.2013/ /.2024/ /.2025/` load; Playwright test proves all four render + archive links resolve.
 
-### F2 — [ ] DNS cutover runbook
+### F2 — [x] DNS cutover runbook
 `RUNBOOK-dns.md`: Cloudflare account + Pages project steps, DNS record import, TTL-lowering, nameserver switch at Dotster, rollback, auto-renew checklist. Luke-executable, numbered, no step assumes prior Cloudflare knowledge.
 *Accept:* every step has a verification ("you should now see…"); rollback section present.
 
