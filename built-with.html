@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Built with — Luke Hornof</title>
+    <meta name="description" content="How hornof.org was built: a small static site shipped by an agentic engineering loop, one tested PR at a time.">
+    <link rel="icon" href="work/img/LH-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <!-- F7: resolve theme before first paint (no flash of the wrong palette). -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var theme =
+            stored === "light" || stored === "dark"
+              ? stored
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      })();
+    </script>
+</head>
+<body>
+    <!-- F7: dark/light theme toggle. JS sets its label + aria-pressed on load. -->
+    <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch color theme">
+        <span class="theme-toggle-icon" aria-hidden="true"></span>
+    </button>
+
+    <!-- F8: colophon / transparency page. Copy source is content/built-with.md. -->
+    <main class="colophon">
+        <p class="colophon-back"><a href="/">&larr; Luke Hornof</a></p>
+
+        <h1>Built with</h1>
+
+        <p>This site is deliberately small. No framework, no build step, no tracking — just three files served as static assets: one <code>index.html</code>, one <code>style.css</code> that holds the entire look (so a future re-skin touches nothing else), and about a hundred lines of dependency-free <code>main.js</code> for the scroll-spy, the time-machine, and the theme toggle. It's hosted on <a href="https://pages.cloudflare.com/">Cloudflare Pages</a>, deployed straight from a <code>git push</code>.</p>
+
+        <p>The more unusual part is how it was built. hornof.org was rebuilt as the first real lane of an <em>agentic engineering loop</em>: an approved product spec and engineering doc up front, then one pull request per feature. Every feature starts as <a href="https://playwright.dev/">Playwright</a> tests written from its acceptance criteria — the tests come first, the implementation follows until they pass. <a href="https://developer.chrome.com/docs/lighthouse/overview/">Lighthouse</a> budgets (performance and accessibility both &ge; 95) gate every change, and a human reviews and merges each PR. The agent is <a href="https://claude.com/claude-code">Claude Code</a>; a person stays in the loop for taste, review, and the calls a model shouldn't make alone.</p>
+
+        <p class="colophon-repo">The whole thing — history, tests, and this page — ships one reviewed pull request at a time. More of my work is on <a href="https://github.com/hornof/">GitHub</a>.</p>
+    </main>
+
+    <script src="main.js"></script>
+</body>
+</html>
