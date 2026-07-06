@@ -22,7 +22,7 @@ Fetch the live hornof.org (current one-pager) and its archive versions; commit v
 Clean one-pager: name · "AI Engineering & Leadership" tagline · one positioning line · social row (LinkedIn, Google Scholar, X, GitHub, SoundCloud). Current earth-tone palette.
 *Accept:* Lighthouse ≥95 perf + a11y; renders at 375px and 1440px (Playwright viewport tests); no placeholder text.
 
-### F4 — [ ] Tardis time-machine
+### F4 — [x] Tardis time-machine
 Subtle control (Easter-egg register, not primary nav) linking the three archives.
 *Accept:* all archives reachable via it; keyboard accessible; Playwright nav test.
 
