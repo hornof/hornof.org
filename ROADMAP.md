@@ -42,7 +42,7 @@ About · Experience · Publications · Talks · Contact, copy generated into `co
 A control that switches between the earth-tone (light) palette and a dark variant. Defaults to the OS `prefers-color-scheme`; user choice persists across reloads (localStorage). All colour values stay isolated in `style.css` (the skin-swap rule).
 *Accept:* toggle flips the theme and updates its `aria-pressed`/label; choice persists across reload; with no stored choice the OS preference wins; keyboard accessible; Lighthouse a11y ≥95 holds in both themes. Playwright proves each.
 
-### F8 — [ ] "Built with" transparency page
+### F8 — [x] "Built with" transparency page
 A subtle section/page documenting how the site was built — the agentic engineering loop, the stack (plain HTML/CSS/JS on Cloudflare Pages), and that it ships PR-per-feature with Playwright gates. Credibility piece, not padding.
 *Accept:* reachable from the page; renders real copy (no lorem ipsum); every external link it carries resolves live (link-liveness test); no Lighthouse regression.
 
