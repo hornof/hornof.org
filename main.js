@@ -7,8 +7,80 @@
     initTardis();
     initBreton();
     initSoundCloud();
+    initProjects();
     initScrollSpy();
   });
+
+  // F11: Projects wall. Entries are inlined JSON (#projects-data); render each to
+  // a card. No fetch — the data is already in the DOM, so this is a pure static
+  // page with zero runtime request.
+  function initProjects() {
+    var list = document.getElementById("projects-list");
+    var dataEl = document.getElementById("projects-data");
+    if (!list || !dataEl) return;
+
+    var entries;
+    try {
+      entries = JSON.parse(dataEl.textContent || "[]");
+    } catch (e) {
+      return; // malformed data — leave the wall empty rather than throw
+    }
+    if (!Array.isArray(entries)) return;
+
+    entries.forEach(function (entry) {
+      list.appendChild(buildCard(entry));
+    });
+  }
+
+  function buildCard(entry) {
+    var card = el("article", "project-card");
+    card.setAttribute("data-slug", entry.slug || "");
+
+    var head = el("div", "project-head");
+    head.appendChild(el("h2", "project-title", entry.title));
+    if (entry.date) head.appendChild(el("span", "project-date", entry.date));
+    card.appendChild(head);
+
+    if (entry.blurb) card.appendChild(el("p", "project-blurb", entry.blurb));
+
+    // "How it was built" line — the differentiator, shown not hidden.
+    var b = entry.build || {};
+    if (b.stack) {
+      var bits = [b.stack];
+      if (b.agents) bits.push(b.agents);
+      if (typeof b.tests === "number") bits.push(b.tests + " tests");
+      if (b.firstPassGreen) bits.push("first-pass green: " + b.firstPassGreen);
+      var buildLine = el("p", "project-build");
+      buildLine.appendChild(el("span", "project-build-label", "Built with "));
+      buildLine.appendChild(document.createTextNode(bits.join(" · ")));
+      if (b.costNote) {
+        buildLine.appendChild(el("span", "project-cost", b.costNote));
+      }
+      card.appendChild(buildLine);
+    }
+
+    var links = entry.links || [];
+    if (links.length) {
+      var nav = el("nav", "project-links");
+      nav.setAttribute("aria-label", (entry.title || "project") + " links");
+      links.forEach(function (l) {
+        if (!l || !l.href) return;
+        var a = el("a", null, l.label || l.href);
+        a.setAttribute("href", l.href);
+        nav.appendChild(a);
+      });
+      card.appendChild(nav);
+    }
+    return card;
+  }
+
+  // Tiny DOM helper: element with optional class + text (text set safely).
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  }
 
   // F10: click-to-load SoundCloud. The player iframe reaches an external host,
   // so we only inject it on interaction — nothing external loads until asked,
@@ -140,9 +212,14 @@
 
   // F5: scroll-spy — highlight the nav link for the section currently in view.
   function initScrollSpy() {
-    var links = Array.prototype.slice.call(
-      document.querySelectorAll(".section-nav a")
-    );
+    // Only in-page anchors take part in scroll-spy; page links (e.g. Projects)
+    // are skipped so they never get a scroll-spy target lookup.
+    var links = Array.prototype.slice
+      .call(document.querySelectorAll(".section-nav a"))
+      .filter(function (a) {
+        var href = a.getAttribute("href");
+        return href && href.charAt(0) === "#";
+      });
     if (!links.length) return;
 
     var sections = links
