@@ -321,6 +321,96 @@ body {
     margin-top: 2rem;
 }
 
+/* ---- Breton Easter egg (F9): faint fleur-de-lis → nod to Brittany ---- */
+.breton {
+    position: relative;
+    display: inline-block;
+    margin-left: 0.75rem;
+}
+
+.breton-toggle {
+    padding: 0 0.2rem;
+    border: none;
+    background: none;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.35;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.breton-toggle:hover,
+.breton-toggle:focus-visible,
+.breton-toggle[aria-expanded="true"] {
+    opacity: 1;
+    color: var(--ink);
+}
+
+.breton-toggle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+.breton-panel {
+    position: absolute;
+    left: 0;
+    bottom: 140%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: max-content;
+    max-width: 18rem;
+    padding: 0.6rem 0.85rem;
+    background: var(--card);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(90, 56, 37, 0.25);
+}
+
+.breton-panel[hidden] {
+    display: none; /* attribute stays authoritative over display:flex */
+}
+
+.breton-text {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--ink);
+}
+
+.breton-text span {
+    font-style: normal;
+    color: var(--ink-soft);
+}
+
+/* Gwenn ha Du — 9 stripes (black at top) with a white ermine canton. */
+.gwenn-ha-du {
+    position: relative;
+    flex: none;
+    width: 42px;
+    height: 27px;
+    border: 1px solid var(--ink-soft);
+    background: repeating-linear-gradient(
+        to bottom,
+        #1a1a1a 0, #1a1a1a 3px,
+        #fff 3px, #fff 6px
+    );
+}
+
+.gwenn-ha-du::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 52%;
+    height: 56%;
+    background:
+        radial-gradient(circle at 32% 42%, #1a1a1a 14%, transparent 15%),
+        radial-gradient(circle at 68% 64%, #1a1a1a 14%, transparent 15%),
+        #fff;
+}
+
 /* ---- Theme toggle (F7) — top-right corner control ---- */
 .theme-toggle {
     position: fixed;

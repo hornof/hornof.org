@@ -5,8 +5,41 @@
   document.addEventListener("DOMContentLoaded", function () {
     initTheme();
     initTardis();
+    initBreton();
     initScrollSpy();
   });
+
+  // F9: Breton Easter egg — a faint fleur-de-lis revealing a nod to Brittany.
+  // Same disclosure pattern as the Tardis (open/close, Escape, outside-click).
+  function initBreton() {
+    var toggle = document.querySelector(".breton-toggle");
+    var panel = document.getElementById("breton-panel");
+    if (!toggle || !panel) return;
+
+    function isOpen() {
+      return toggle.getAttribute("aria-expanded") === "true";
+    }
+    function open() {
+      panel.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+    }
+    function close(returnFocus) {
+      panel.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+      if (returnFocus) toggle.focus();
+    }
+
+    toggle.addEventListener("click", function () {
+      if (isOpen()) close(false);
+      else open();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen()) close(true);
+    });
+    document.addEventListener("click", function (e) {
+      if (isOpen() && !e.target.closest(".breton")) close(false);
+    });
+  }
 
   // F7: dark/light toggle. The head script already resolved data-theme before
   // paint (localStorage → OS preference); here we just wire the button and keep
