@@ -189,6 +189,49 @@ body {
     color: var(--ink);
 }
 
+/* Experience / Publications / Talks lists */
+.cv,
+.pubs,
+.talks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cv li {
+    margin-bottom: 1.1rem;
+    max-width: 36rem;
+}
+
+.cv-role {
+    font-size: 1.1rem;
+}
+
+.cv-when {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.cv-what {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 1rem;
+}
+
+.pubs li,
+.talks li {
+    margin-bottom: 0.9rem;
+    max-width: 36rem;
+    font-size: 1.05rem;
+}
+
+.more {
+    margin-top: 1.25rem;
+    font-size: 1rem;
+}
+
 /* ---- Tardis time-machine (F4) — subtle corner control ---- */
 .tardis {
     position: fixed;

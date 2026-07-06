@@ -27,7 +27,7 @@ test.describe("F3: minimal core content", () => {
   });
 
   test("shows the tagline and exactly one positioning line", async ({ page }) => {
-    await expect(page.getByText(/AI Engineering & Leadership/i)).toBeVisible();
+    await expect(page.locator(".tagline")).toHaveText(/AI Engineering & Leadership/i);
     const positioning = page.locator(".positioning");
     await expect(positioning).toHaveCount(1);
     await expect(positioning).toBeVisible();
