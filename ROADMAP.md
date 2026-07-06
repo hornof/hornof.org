@@ -30,6 +30,6 @@ Subtle control (Easter-egg register, not primary nav) linking the three archives
 Fixed left sidebar, scroll-spy nav lighting up per section, content right; single column on mobile.
 *Accept:* scroll-spy tracks section in view; keyboard navigable; mobile collapse tested.
 
-### F6 — [ ] Real sections + reduced-motion
+### F6 — [x] Real sections + reduced-motion
 About · Experience · Publications · Talks · Contact, copy generated into `content/` from Luke's real assets (resume, publications, talks index in Claude-Cowork) — flag any thin section in the PR rather than padding it. Site-wide `prefers-reduced-motion` guard.
 *Accept:* every publication/talk links somewhere real (link-liveness test); no lorem ipsum; reduced-motion respected. **Luke sign-off on copy in the PR is part of done.**
