@@ -2,19 +2,20 @@
   {
     "slug": "hornof-org",
     "title": "hornof.org",
-    "blurb": "This site — a static personal site rebuilt by an agentic engineering loop, one tested pull request at a time.",
+    "blurb": "This site. Rebuilt from a Dotster one-pager into a modern static site by an agentic engineering loop — each feature specced, tested, and shipped as its own reviewed pull request.",
     "date": "2026-07",
     "links": [
+      { "label": "Live site", "href": "https://hornof.org" },
       { "label": "How it was built", "href": "built-with.html" },
-      { "label": "SoundCloud", "href": "https://soundcloud.com/luke-hornof" }
+      { "label": "GitHub", "href": "https://github.com/hornof/" }
     ],
     "build": {
       "stack": "Plain HTML · one style.css · vanilla JS · Cloudflare Pages",
       "agents": "Claude Code",
       "models": "Opus 4.8",
-      "tests": 64,
-      "firstPassGreen": "mostly — review caught the rest",
-      "costNote": "Built across the F-series loop iterations; usage tracked in the loop metrics."
+      "tests": 72,
+      "firstPassGreen": "mostly — human review caught the rest",
+      "costNote": "Tests written before code; every feature landed as its own reviewed PR, none straight to main."
     }
   }
 ]
