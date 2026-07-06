@@ -7,8 +7,10 @@ phased rebuild plan.
 ## Layout
 
 ```
-index.html            # current live site (the GenAI one-pager), ported verbatim
-work/                 # current site assets (css, fonts, js, img)
+index.html            # the site — F3 minimal-core one-pager
+style.css             # all styling, isolated here (a skin swap touches only this file)
+work/img/             # brown social icons + favicon (still referenced by index.html)
+work/                 # legacy current-site assets (css/fonts/js) — kept for the /.2025 archive
 .2013/                # archive: the original Homestead multi-page site (2013 snapshot)
 .2024/                # archive: same original site, 2024 snapshot
 .2025/                # archive: the current GenAI rebuild, 2025 snapshot

@@ -1,0 +1,105 @@
+/* hornof.org — minimal core (F3).
+   All styling is isolated here: a future skin swap touches only this file.
+   Earth-tone palette carried over from the current site; system serif stack
+   (no licensed web font, no hero photo) keeps the page light and self-hosted. */
+
+:root {
+    --ink: #5a3825;        /* dark brown — signature ink */
+    --cream: #f2ebe0;      /* light earth tone (background top) */
+    --tan: #cbb391;        /* warm earth tone (background bottom) */
+    --card: rgba(255, 255, 255, 0.92);
+    --serif: Garamond, Baskerville, "Hoefler Text", "Times New Roman", Times, serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: linear-gradient(160deg, var(--cream) 0%, var(--tan) 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.6;
+}
+
+.card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card);
+    padding: 2.5rem;
+    border-radius: 8px;
+    box-shadow: -16px -16px 32px rgba(90, 56, 37, 0.25);
+}
+
+.name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: normal;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.tagline {
+    margin: 1rem 0 1.5rem;
+    font-size: 1.6rem;
+    font-weight: normal;
+}
+
+.positioning {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.social {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.social a {
+    display: inline-flex;
+    line-height: 0;
+    border-radius: 4px;
+}
+
+.social img {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.social a:hover img,
+.social a:focus-visible img {
+    transform: scale(1.2);
+}
+
+.social a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 4px;
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 1.75rem;
+    }
+    .tagline {
+        font-size: 1.4rem;
+    }
+    .social {
+        gap: 1.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

@@ -18,7 +18,7 @@ Fetch the live hornof.org (current one-pager) and its archive versions; commit v
 `RUNBOOK-dns.md`: Cloudflare account + Pages project steps, DNS record import, TTL-lowering, nameserver switch at Dotster, rollback, auto-renew checklist. Luke-executable, numbered, no step assumes prior Cloudflare knowledge.
 *Accept:* every step has a verification ("you should now see…"); rollback section present.
 
-### F3 — [ ] Minimal core rebuild
+### F3 — [x] Minimal core rebuild
 Clean one-pager: name · "AI Engineering & Leadership" tagline · one positioning line · social row (LinkedIn, Google Scholar, X, GitHub, SoundCloud). Current earth-tone palette.
 *Accept:* Lighthouse ≥95 perf + a11y; renders at 375px and 1440px (Playwright viewport tests); no placeholder text.
 
