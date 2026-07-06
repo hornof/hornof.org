@@ -6,8 +6,38 @@
     initTheme();
     initTardis();
     initBreton();
+    initSoundCloud();
     initScrollSpy();
   });
+
+  // F10: click-to-load SoundCloud. The player iframe reaches an external host,
+  // so we only inject it on interaction — nothing external loads until asked,
+  // which keeps the Lighthouse perf budget intact.
+  function initSoundCloud() {
+    var facade = document.querySelector(".soundcloud");
+    if (!facade) return;
+    var btn = facade.querySelector(".sc-play");
+    if (!btn) return;
+
+    btn.addEventListener("click", function () {
+      var url =
+        facade.getAttribute("data-sc-url") ||
+        "https://soundcloud.com/luke-hornof";
+      var frame = document.createElement("iframe");
+      frame.className = "sc-frame";
+      frame.title = "Luke Hornof on SoundCloud";
+      frame.setAttribute("loading", "lazy");
+      frame.setAttribute("allow", "autoplay");
+      frame.setAttribute("scrolling", "no");
+      frame.setAttribute("frameborder", "0");
+      frame.src =
+        "https://w.soundcloud.com/player/?url=" +
+        encodeURIComponent(url) +
+        "&color=%235a3825&auto_play=false&hide_related=true" +
+        "&show_comments=false&show_user=true&visual=false";
+      btn.replaceWith(frame);
+    });
+  }
 
   // F9: Breton Easter egg — a faint fleur-de-lis revealing a nod to Brittany.
   // Same disclosure pattern as the Tardis (open/close, Escape, outside-click).

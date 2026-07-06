@@ -50,6 +50,6 @@ A subtle section/page documenting how the site was built — the agentic enginee
 A subtle flourish in the same Easter-egg register as the Tardis (not primary nav) — a nod to France/Brittany. Hidden until invoked; keyboard accessible.
 *Accept:* not visible on load; invoking it (click or keyboard) reveals it; Escape/dismiss works; keyboard operable; no Lighthouse regression. Playwright nav test.
 
-### F10 — [ ] SoundCloud now-playing embed
+### F10 — [x] SoundCloud now-playing embed
 Surface Luke's SoundCloud from the music thread. The embed is an external iframe, so it must be lazy/deferred and must not regress the F3 perf budget.
 *Accept:* embed present and pointing at Luke's SoundCloud; loaded with `loading="lazy"` (or click-to-load) so it doesn't block first paint; Lighthouse perf ≥95 and a11y ≥95 still hold with it on the page. Playwright proves presence + budget.

@@ -113,6 +113,17 @@
             <section id="contact">
                 <h2>Contact</h2>
                 <p>SF Bay Area. Email <a href="mailto:luke@hornof.org">luke@hornof.org</a>, or find me on the profiles linked in the sidebar.</p>
+
+                <!-- F10: SoundCloud, click-to-load. The player iframe is only
+                     injected on interaction, so it never blocks first paint or
+                     touches an external host on load (protects the perf budget). -->
+                <div class="soundcloud" data-sc-url="https://soundcloud.com/luke-hornof">
+                    <button type="button" class="sc-play" aria-label="Load the SoundCloud player for Luke Hornof">
+                        <span class="sc-play-icon" aria-hidden="true">&#9654;</span>
+                        <span>Listen on SoundCloud</span>
+                    </button>
+                    <noscript><a href="https://soundcloud.com/luke-hornof">Luke Hornof on SoundCloud</a></noscript>
+                </div>
             </section>
 
             <!-- F8: subtle colophon link to the transparency page. -->
