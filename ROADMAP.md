@@ -46,7 +46,7 @@ A control that switches between the earth-tone (light) palette and a dark varian
 A subtle section/page documenting how the site was built — the agentic engineering loop, the stack (plain HTML/CSS/JS on Cloudflare Pages), and that it ships PR-per-feature with Playwright gates. Credibility piece, not padding.
 *Accept:* reachable from the page; renders real copy (no lorem ipsum); every external link it carries resolves live (link-liveness test); no Lighthouse regression.
 
-### F9 — [ ] France/Brittany Easter egg
+### F9 — [x] France/Brittany Easter egg
 A subtle flourish in the same Easter-egg register as the Tardis (not primary nav) — a nod to France/Brittany. Hidden until invoked; keyboard accessible.
 *Accept:* not visible on load; invoking it (click or keyboard) reveals it; Escape/dismiss works; keyboard operable; no Lighthouse regression. Playwright nav test.
 
