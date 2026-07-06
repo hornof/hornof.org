@@ -26,7 +26,7 @@ Clean one-pager: name · "AI Engineering & Leadership" tagline · one positionin
 Subtle control (Easter-egg register, not primary nav) linking the three archives.
 *Accept:* all archives reachable via it; keyboard accessible; Playwright nav test.
 
-### F5 — [ ] Sidebar layout + scroll-spy
+### F5 — [x] Sidebar layout + scroll-spy
 Fixed left sidebar, scroll-spy nav lighting up per section, content right; single column on mobile.
 *Accept:* scroll-spy tracks section in view; keyboard navigable; mobile collapse tested.
 
