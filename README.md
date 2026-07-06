@@ -46,18 +46,22 @@ No build command. Settings:
 
 `wrangler.toml` captures this (`pages_build_output_dir = "."`).
 
+### Go-live
+
+`RUNBOOK-dns.md` is the numbered, no-prior-Cloudflare-knowledge guide for the
+cutover from Dotster to Cloudflare Pages: create the account + Pages project,
+stage the DNS move (nameservers first, content second), roll back, and confirm
+registrar auto-renew. Every step has a verification; it's docs-only — Luke runs
+the registrar steps.
+
 ### ⚠️ Archive dot-directory caveat
 
-Cloudflare Pages **excludes files and directories whose names begin with a dot**
-from the default upload, so `.2013/ .2024/ .2025/` will not serve as-is. The
-literal `/.2013/` paths are the spec's source of truth (`ROADMAP.md` ground rules)
-and are what the local server and Playwright tests exercise. Resolving this for the
-live host is deferred to **F2 (DNS cutover / deploy)**; the options are:
-
-1. A Pages `_redirects` / Function that aliases `/.2013/*` to a dot-free build path
-   populated at deploy time, or
-2. A deploy step (`wrangler pages deploy`) that copies the archives to dot-free
-   directories and adds redirect rules.
-
-This is called out here rather than silently changing the on-disk layout, which the
-ROADMAP fixes as `.2013/.2024/.2025`.
+The archives sit in dot-prefixed folders (`.2013/ .2024/ .2025/`), and it's
+unverified whether Cloudflare Pages serves dot-directories (its docs only
+document excluding `.git`/`node_modules`, and it *does* serve `.well-known`). So
+the runbook **verifies the archives on the preview URL** and, only if they 404,
+applies a fallback (`RUNBOOK-dns.md` → Appendix A: a deploy-time copy to dot-free
+folders plus a `_redirects` rewrite, keeping `/.2013/` as the canonical URL). The
+on-disk `.2013/.2024/.2025` layout is never renamed — the `ROADMAP.md` ground
+rules fix it, and the local `server.js` + Playwright tests exercise those exact
+paths.
