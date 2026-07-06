@@ -3,9 +3,45 @@
   "use strict";
 
   document.addEventListener("DOMContentLoaded", function () {
+    initTheme();
     initTardis();
     initScrollSpy();
   });
+
+  // F7: dark/light toggle. The head script already resolved data-theme before
+  // paint (localStorage → OS preference); here we just wire the button and keep
+  // its label / aria-pressed in sync, persisting the user's choice.
+  function initTheme() {
+    var toggle = document.querySelector(".theme-toggle");
+    if (!toggle) return;
+    var root = document.documentElement;
+
+    function current() {
+      return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    }
+    function sync() {
+      var dark = current() === "dark";
+      toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+      toggle.setAttribute(
+        "aria-label",
+        dark ? "Switch to light theme" : "Switch to dark theme"
+      );
+    }
+    function set(theme) {
+      root.setAttribute("data-theme", theme);
+      try {
+        localStorage.setItem("theme", theme);
+      } catch (e) {
+        /* private mode / storage disabled — the toggle still works in-session */
+      }
+      sync();
+    }
+
+    sync(); // reflect the pre-paint theme in the button on load
+    toggle.addEventListener("click", function () {
+      set(current() === "dark" ? "light" : "dark");
+    });
+  }
 
   // F4: Tardis time-machine — a subtle control revealing links to the archives.
   function initTardis() {
