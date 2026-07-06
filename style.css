@@ -1,10 +1,9 @@
-/* hornof.org — minimal core (F3).
-   All styling is isolated here: a future skin swap touches only this file.
-   Earth-tone palette carried over from the current site; system serif stack
-   (no licensed web font, no hero photo) keeps the page light and self-hosted. */
+/* hornof.org — all styling isolated here (a future skin swap touches only this
+   file). Earth-tone palette; system serif stack; no web font, no hero photo. */
 
 :root {
     --ink: #5a3825;        /* dark brown — signature ink */
+    --ink-soft: rgba(90, 56, 37, 0.6);
     --cream: #f2ebe0;      /* light earth tone (background top) */
     --tan: #cbb391;        /* warm earth tone (background bottom) */
     --card: rgba(255, 255, 255, 0.92);
@@ -15,13 +14,13 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
     background: linear-gradient(160deg, var(--cream) 0%, var(--tan) 100%);
     background-attachment: fixed;
     color: var(--ink);
@@ -29,13 +28,41 @@ body {
     line-height: 1.6;
 }
 
-.card {
-    width: 100%;
-    max-width: 600px;
-    background: var(--card);
+/* ---- Layout: fixed left sidebar + scrolling content (F5) ---- */
+.layout {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sidebar {
     padding: 2.5rem;
-    border-radius: 8px;
-    box-shadow: -16px -16px 32px rgba(90, 56, 37, 0.25);
+}
+
+.content {
+    padding: 2.5rem;
+    padding-bottom: 35vh; /* room so any section can scroll under the spy line */
+}
+
+@media (min-width: 880px) {
+    .layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 42%) 1fr;
+        align-items: start;
+    }
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3rem;
+    }
+}
+
+/* ---- Intro (name · tagline · positioning) ---- */
+.intro {
+    max-width: 30rem;
 }
 
 .name {
@@ -47,8 +74,8 @@ body {
 }
 
 .tagline {
-    margin: 1rem 0 1.5rem;
-    font-size: 1.6rem;
+    margin: 1rem 0 1.25rem;
+    font-size: 1.7rem;
     font-weight: normal;
 }
 
@@ -57,10 +84,62 @@ body {
     font-size: 1.1rem;
 }
 
+/* ---- Scroll-spy nav ---- */
+.section-nav {
+    margin: 2.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.section-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.15rem 0;
+    width: max-content;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+/* Growing indicator line, Chiang-style. */
+.section-nav a::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    background: var(--ink-soft);
+    transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.section-nav a:hover,
+.section-nav a:focus-visible,
+.section-nav a.active,
+.section-nav a[aria-current="true"] {
+    color: var(--ink);
+}
+
+.section-nav a.active::before,
+.section-nav a[aria-current="true"]::before,
+.section-nav a:hover::before,
+.section-nav a:focus-visible::before {
+    width: 2.75rem;
+    background: var(--ink);
+}
+
+.section-nav a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+/* ---- Social row ---- */
 .social {
     display: flex;
     gap: 1.5rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .social a {
@@ -85,12 +164,157 @@ body {
     outline-offset: 4px;
 }
 
+/* ---- Content sections ---- */
+.content section {
+    min-height: 70vh;
+    max-width: 42rem;
+    padding: 1rem 0;
+    scroll-margin-top: 1.5rem;
+}
+
+.content h2 {
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    font-weight: normal;
+    letter-spacing: 0.02em;
+}
+
+.content section p {
+    margin: 0;
+    font-size: 1.15rem;
+    max-width: 34rem;
+}
+
+.content a {
+    color: var(--ink);
+}
+
+/* Experience / Publications / Talks lists */
+.cv,
+.pubs,
+.talks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cv li {
+    margin-bottom: 1.1rem;
+    max-width: 36rem;
+}
+
+.cv-role {
+    font-size: 1.1rem;
+}
+
+.cv-when {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.cv-what {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 1rem;
+}
+
+.pubs li,
+.talks li {
+    margin-bottom: 0.9rem;
+    max-width: 36rem;
+    font-size: 1.05rem;
+}
+
+.more {
+    margin-top: 1.25rem;
+    font-size: 1rem;
+}
+
+/* ---- Tardis time-machine (F4) — subtle corner control ---- */
+.tardis {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column-reverse; /* button at the corner, panel opens above it */
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.tardis-toggle {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(90, 56, 37, 0.35);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+}
+
+.tardis-toggle:hover,
+.tardis-toggle:focus-visible,
+.tardis-toggle[aria-expanded="true"] {
+    opacity: 1;
+}
+
+.tardis-toggle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.tardis-panel {
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--card);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(90, 56, 37, 0.25);
+}
+
+.tardis-panel[hidden] {
+    display: none; /* keep the attribute authoritative over display:flex */
+}
+
+.tardis-panel a {
+    display: block;
+    padding: 6px 16px;
+    border-radius: 4px;
+    color: var(--ink);
+    text-decoration: none;
+    text-align: right;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+.tardis-panel a:hover,
+.tardis-panel a:focus-visible {
+    background: rgba(90, 56, 37, 0.08);
+}
+
+.tardis-panel a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+}
+
+/* ---- Small screens ---- */
 @media (max-width: 480px) {
-    .card {
+    .sidebar,
+    .content {
         padding: 1.75rem;
     }
     .tagline {
-        font-size: 1.4rem;
+        font-size: 1.45rem;
     }
     .social {
         gap: 1.25rem;
@@ -98,6 +322,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
     * {
         animation: none !important;
         transition: none !important;
