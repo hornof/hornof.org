@@ -5,9 +5,18 @@
     "blurb": "This site. Rebuilt from a Dotster one-pager into a modern static site by an agentic engineering loop — each feature specced, tested, and shipped as its own reviewed pull request.",
     "date": "2026-07",
     "links": [
-      { "label": "Live site", "href": "https://hornof.org" },
-      { "label": "How it was built", "href": "built-with.html" },
-      { "label": "GitHub", "href": "https://github.com/hornof/" }
+      {
+        "label": "Live site",
+        "href": "https://hornof.org"
+      },
+      {
+        "label": "How it was built",
+        "href": "built-with.html"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/hornof/"
+      }
     ],
     "build": {
       "stack": "Plain HTML · one style.css · vanilla JS · Cloudflare Pages",
@@ -16,6 +25,34 @@
       "tests": 72,
       "firstPassGreen": "mostly — human review caught the rest",
       "costNote": "Tests written before code; every feature landed as its own reviewed PR, none straight to main."
+    }
+  },
+  {
+    "slug": "eclipse-sim",
+    "title": "eclipse-sim",
+    "blurb": "A solar-system orrery computed from Newton's laws — no ephemeris lookups — that predicts real solar and lunar eclipses and shows its miss margin against the NASA catalog on every row. Built overnight from a one-page brief.",
+    "date": "2026-07",
+    "links": [
+      {
+        "label": "Run it",
+        "href": "projects/eclipse/"
+      },
+      {
+        "label": "How it was built",
+        "href": "eclipse-built.html"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/hornof/eclipse-sim"
+      }
+    ],
+    "build": {
+      "stack": "ES modules · Three.js (CDN) · Web Worker · no bundler, no build step",
+      "agents": "Claude Code (/goal loop, unattended overnight)",
+      "models": "Opus 4.8",
+      "tests": 135,
+      "firstPassGreen": "overnight suite green — then hand-testing found 4 bugs the suite missed; see the writeup",
+      "costNote": "47 minutes from brief to working predictor. The debugging afterward became the testing playbook (property-based + mutation tests, 94% mutation score)."
     }
   }
 ]
