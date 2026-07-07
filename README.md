@@ -12,7 +12,6 @@ style.css             # all styling, isolated here (a skin swap touches only thi
 work/img/             # brown social icons + favicon (still referenced by index.html)
 work/                 # legacy current-site assets (css/fonts/js) — kept for the /.2025 archive
 .2013/                # archive: the original Homestead multi-page site (2013 snapshot)
-.2024/                # archive: same original site, 2024 snapshot
 .2025/                # archive: the current GenAI rebuild, 2025 snapshot
 server.js             # zero-dep static server for local dev + tests (serves dot-dirs)
 tests/                # Playwright acceptance tests
@@ -21,7 +20,7 @@ wrangler.toml         # Cloudflare Pages config
 ```
 
 The archives are **read-only** — never modify their contents. They were captured
-from production (current site) and the Wayback Machine (2013/2024 snapshots), and
+from production (current site) and the Wayback Machine (2013 snapshot), and
 are committed verbatim.
 
 ## Local development
@@ -56,12 +55,12 @@ the registrar steps.
 
 ### ⚠️ Archive dot-directory caveat
 
-The archives sit in dot-prefixed folders (`.2013/ .2024/ .2025/`), and it's
+The archives sit in dot-prefixed folders (`.2013/ .2025/`), and it's
 unverified whether Cloudflare Pages serves dot-directories (its docs only
 document excluding `.git`/`node_modules`, and it *does* serve `.well-known`). So
 the runbook **verifies the archives on the preview URL** and, only if they 404,
 applies a fallback (`RUNBOOK-dns.md` → Appendix A: a deploy-time copy to dot-free
 folders plus a `_redirects` rewrite, keeping `/.2013/` as the canonical URL). The
-on-disk `.2013/.2024/.2025` layout is never renamed — the `ROADMAP.md` ground
+on-disk `.2013/.2025` layout is never renamed — the `ROADMAP.md` ground
 rules fix it, and the local `server.js` + Playwright tests exercise those exact
 paths.

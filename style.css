@@ -9,6 +9,18 @@
     --card: rgba(255, 255, 255, 0.92);
     --icon-filter: none;   /* social icons: brown PNGs, untouched in light mode */
     --serif: Garamond, Baskerville, "Hoefler Text", "Times New Roman", Times, serif;
+    /* Tardis (F4) — earth-tone, not the Doctor Who blue, to match the site. */
+    --tardis-body: #6f4527;
+    --tardis-roof: #543421;
+    --tardis-dark: #3f2716;
+    --tardis-window: #efe7d6;
+    --tardis-lamp: #d3a24f;
+    --tardis-line: #3f2716;
+    /* No wash — the panorama shows raw (Luke's tuner pick 2026-07-06). */
+    --scrim: linear-gradient(160deg, rgba(214, 190, 150, 0) 0%, rgba(184, 156, 116, 0.06) 100%);
+    /* Frosted panel: warm cream at 50% — translucent, art breathes through. */
+    --panel: rgba(244, 236, 218, 0.50);
+    --panel-edge: rgba(90, 56, 37, 0.14);
 }
 
 /* F7: dark variant — same earth family, inverted. Only colour values change; the
@@ -21,6 +33,18 @@
     --card: rgba(42, 29, 18, 0.95);
     /* Recolour the brown social PNGs to the cream ink so they stay legible. */
     --icon-filter: brightness(0) invert(0.88) sepia(0.25);
+    /* Lighter Tardis tones so it reads on the dark ground. */
+    --tardis-body: #a9784c;
+    --tardis-roof: #855c37;
+    --tardis-dark: #6a4728;
+    --tardis-window: #f1e8d6;
+    --tardis-lamp: #e2bd6b;
+    --tardis-line: #5a3c22;
+    /* Dark mode keeps a wash so the bright panorama still reads "dark"; panel is
+       a translucent warm-dark to mirror the light theme's 50% feel. */
+    --scrim: linear-gradient(160deg, rgba(20, 13, 7, 0.46) 0%, rgba(10, 6, 3, 0.56) 100%);
+    --panel: rgba(30, 21, 12, 0.52);
+    --panel-edge: rgba(236, 224, 203, 0.12);
 }
 
 * {
@@ -35,16 +59,69 @@ body {
     margin: 0;
     min-height: 100vh;
     background: linear-gradient(160deg, var(--cream) 0%, var(--tan) 100%);
-    background-attachment: fixed;
     color: var(--ink);
     font-family: var(--serif);
     line-height: 1.6;
+}
+
+/* Original DALL-E panorama, brought back as a fixed textured backdrop with the
+   old slow zoom; a palette scrim over it keeps the text legible. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: url("work/img/bg-panorama.webp") center center / cover no-repeat;
+    filter: brightness(1.06) saturate(1.03); /* lift the panorama a touch */
+    animation: zoomBackground 24s ease-in-out infinite alternate;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--scrim);
+}
+
+/* Smaller panorama on small screens — keeps the mobile Lighthouse budget. */
+@media (max-width: 880px) {
+    body::before {
+        background-image: url("work/img/bg-panorama-sm.webp");
+    }
+}
+
+@keyframes zoomBackground {
+    from { transform: scale(1); }
+    to   { transform: scale(1.08); }
 }
 
 /* ---- Layout: fixed left sidebar + scrolling content (F5) ---- */
 .layout {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 1.25rem; /* gutter so the panorama frames the frosted panels */
+}
+
+/* Frosted-glass panels: translucent + blurred backdrop so the panorama blurs
+   softly behind the text (legible) while staying crisp in the margins/gutter.
+   Also used by the Projects wall and the Built-with page (same shell). */
+.sidebar,
+.content,
+.projects,
+.colophon {
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
+    border: 1px solid var(--panel-edge);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(50, 32, 18, 0.14);
+}
+
+/* The single-column pages get a little breathing room around their panel. */
+.projects,
+.colophon {
+    margin: 1.25rem auto;
 }
 
 .sidebar {
@@ -60,16 +137,25 @@ body {
     .layout {
         display: grid;
         grid-template-columns: minmax(300px, 42%) 1fr;
+        gap: 1.25rem; /* panorama peeks through the gutter between panels */
         align-items: start;
+        height: 100vh; /* lock both frames to the viewport */
     }
     .sidebar {
         position: sticky;
-        top: 0;
-        height: 100vh;
+        top: 1.25rem;
+        height: calc(100vh - 2.5rem);
         display: flex;
         flex-direction: column;
         justify-content: center;
         padding: 3rem;
+    }
+    /* Right frame is the same fixed height as the sidebar; the text scrolls
+       inside it rather than the whole page scrolling. */
+    .content {
+        height: calc(100vh - 2.5rem);
+        overflow-y: auto;
+        scroll-behavior: smooth;
     }
 }
 
@@ -92,8 +178,9 @@ body {
     font-weight: normal;
 }
 
+/* Hero fragment lines — short, generously spaced, echoing the original site. */
 .positioning {
-    margin: 0;
+    margin: 0 0 0.85rem;
     font-size: 1.1rem;
 }
 
@@ -179,11 +266,17 @@ body {
 }
 
 /* ---- Content sections ---- */
+/* Uniform vertical rhythm: every section carries the same top+bottom padding,
+   so the gap between any two sections is identical regardless of content length
+   (no min-height, which made short sections leave big gaps and long ones small). */
 .content section {
-    min-height: 70vh;
     max-width: 42rem;
-    padding: 1rem 0;
+    padding: 3rem 0;
     scroll-margin-top: 1.5rem;
+}
+
+.content section:first-of-type {
+    padding-top: 0;
 }
 
 .content h2 {
@@ -273,8 +366,22 @@ body {
 
 .colophon {
     max-width: 40rem;
-    margin: 0 auto;
-    padding: 4rem 2rem 6rem;
+    margin: 1.25rem auto;
+    padding: 4rem 2rem;
+}
+
+/* Fixed-height frosted pane on desktop; the text scrolls within it — same
+   pattern as the main page's content column. Mobile scrolls the page. */
+@media (min-width: 880px) {
+    /* Only the pane scrolls, not the page. */
+    body.page-fixed {
+        overflow: hidden;
+    }
+    .colophon {
+        height: calc(100vh - 2.5rem);
+        overflow-y: auto;
+        scroll-behavior: smooth;
+    }
 }
 
 .colophon-back a {
@@ -426,51 +533,6 @@ body {
     outline-offset: 3px;
 }
 
-/* ---- SoundCloud (F10): click-to-load player ---- */
-.soundcloud {
-    margin-top: 1.75rem;
-    max-width: 36rem;
-}
-
-.sc-play {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 1.1rem;
-    border: 1px solid var(--ink-soft);
-    border-radius: 6px;
-    background: var(--card);
-    color: var(--ink);
-    font-family: var(--serif);
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.sc-play:hover,
-.sc-play:focus-visible {
-    border-color: var(--ink);
-    transform: translateY(-1px);
-}
-
-.sc-play:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
-}
-
-.sc-play-icon {
-    font-size: 0.85rem;
-    line-height: 1;
-}
-
-.sc-frame {
-    width: 100%;
-    height: 166px;
-    border: 0;
-    border-radius: 6px;
-}
-
 /* ---- Breton Easter egg (F9): faint fleur-de-lis → nod to Brittany ---- */
 .breton {
     position: relative;
@@ -514,7 +576,10 @@ body {
     width: max-content;
     max-width: 18rem;
     padding: 0.6rem 0.85rem;
-    background: var(--card);
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
+    border: 1px solid var(--panel-edge);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(90, 56, 37, 0.25);
 }
@@ -561,6 +626,54 @@ body {
         #fff;
 }
 
+/* TEMP — live look-and-feel tuner; remove with initDevColorPanel(). */
+.dev-panel {
+    position: fixed;
+    left: 14px;
+    top: 14px;
+    z-index: 50;
+    width: 250px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(28, 20, 12, 0.92);
+    color: #f2ebe0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+
+.dev-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 10px;
+}
+
+.dev-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 10px;
+    font-size: 0.72rem;
+}
+
+.dev-row input[type="range"] {
+    width: 100%;
+    accent-color: #d3a24f;
+}
+
+.dev-read {
+    display: block;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(242, 235, 224, 0.2);
+    font-size: 0.66rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+    opacity: 0.85;
+}
+
 /* ---- Theme toggle (F7) — top-right corner control ---- */
 .theme-toggle {
     position: fixed;
@@ -571,8 +684,10 @@ body {
     height: 34px;
     padding: 0;
     border-radius: 50%;
-    border: 1px solid var(--ink-soft);
-    background: var(--card);
+    border: 1px solid var(--panel-edge);
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
     color: var(--ink);
     font-size: 16px;
     line-height: 1;
@@ -612,18 +727,17 @@ body {
 }
 
 .tardis-toggle {
-    width: 34px;
-    height: 34px;
+    position: relative;
+    width: 42px;
+    height: 60px;
     padding: 0;
-    border-radius: 50%;
-    border: 1px solid rgba(90, 56, 37, 0.35);
-    background: rgba(255, 255, 255, 0.6);
-    color: var(--ink);
-    font-size: 17px;
-    line-height: 1;
+    border: none;
+    background: none;
+    line-height: 0;
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.7;
     transition: opacity 0.2s ease;
+    perspective: 320px; /* gives the spin a little depth */
 }
 
 .tardis-toggle:hover,
@@ -634,7 +748,56 @@ body {
 
 .tardis-toggle:focus-visible {
     outline: 2px solid var(--ink);
-    outline-offset: 3px;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.tardis-svg {
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(63, 39, 22, 0.3));
+    /* Always spinning, like the Tardis materialising (reduced-motion disables
+       it via the site-wide guard). */
+    animation: tardis-spin 5s linear infinite;
+}
+
+/* Tardis colours (earth palette; all in style.css per the skin rule). */
+.td-body { fill: var(--tardis-body); }
+.td-roof { fill: var(--tardis-roof); }
+.td-dark { fill: var(--tardis-dark); }
+.td-window { fill: var(--tardis-window); }
+.td-lamp { fill: var(--tardis-lamp); }
+.td-line { fill: none; stroke: var(--tardis-line); stroke-width: 0.8; }
+.td-door { stroke-width: 1; }
+.td-panel { fill: none; stroke: var(--tardis-line); stroke-width: 0.8; }
+
+@keyframes tardis-spin {
+    to { transform: rotateY(360deg); }
+}
+
+/* "Click to time travel!" — appears to the left on hover/focus. */
+.tardis-label {
+    position: absolute;
+    right: 52px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    font-style: italic;
+    color: var(--ink);
+    /* No pill — sits on the page and blends with the palette; the soft halo in
+       the page tone keeps it legible over the gradient. */
+    background: none;
+    box-shadow: none;
+    text-shadow: 0 0 6px var(--cream), 0 1px 2px var(--cream);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.tardis-toggle:hover .tardis-label,
+.tardis-toggle:focus-visible .tardis-label {
+    opacity: 1;
 }
 
 .tardis-panel {
@@ -644,7 +807,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    background: var(--card);
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
+    border: 1px solid var(--panel-edge);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(90, 56, 37, 0.25);
 }

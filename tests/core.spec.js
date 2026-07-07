@@ -1,16 +1,20 @@
 // @ts-check
 // F3 — Minimal core rebuild.
-// Acceptance: clean one-pager (name · "AI Engineering & Leadership" tagline · one
+// Acceptance: clean one-pager (name · "AI Engineering Leader" tagline · one
 // positioning line · social row); current earth-tone palette; renders at 375px
 // and 1440px; no placeholder text. (Lighthouse ≥95 perf+a11y: lighthouse.spec.js.)
 const { test, expect } = require("@playwright/test");
 
 // The five social profiles the minimal core must expose (ROADMAP F3).
+// The full set from the original hornof.org (Facebook + Instagram were dropped
+// in the F3 minimal pass and restored in polish round 1).
 const SOCIAL = [
   { label: "LinkedIn", href: "linkedin.com/in/lukehornof" },
   { label: "Google Scholar", href: "scholar.google.com" },
   { label: "X", href: "x.com/hornof" },
   { label: "GitHub", href: "github.com/hornof" },
+  { label: "Facebook", href: "facebook.com/lukehornof" },
+  { label: "Instagram", href: "instagram.com/lukehornof" },
   { label: "SoundCloud", href: "soundcloud.com/luke-hornof" },
 ];
 
@@ -26,16 +30,17 @@ test.describe("F3: minimal core content", () => {
     await expect(h1).toHaveText(/Luke Hornof/i);
   });
 
-  test("shows the tagline and exactly one positioning line", async ({ page }) => {
-    await expect(page.locator(".tagline")).toHaveText(/AI Engineering & Leadership/i);
-    const positioning = page.locator(".positioning");
-    await expect(positioning).toHaveCount(1);
-    await expect(positioning).toBeVisible();
-    const text = (await positioning.innerText()).trim();
-    expect(text.length).toBeGreaterThan(0);
+  test("shows the tagline and the hero fragment lines", async ({ page }) => {
+    await expect(page.locator(".tagline")).toHaveText(/AI Engineering Leader/i);
+    const lines = page.locator(".positioning");
+    await expect(lines).toHaveCount(2);
+    await expect(lines.first()).toContainText(/Founder, researcher, agentic engineer/i);
+    await expect(lines.last()).toContainText(
+      /amazing teams, successful products, happy customers/i
+    );
   });
 
-  test("social row exposes exactly the five named profiles", async ({ page }) => {
+  test("social row exposes exactly the named profiles", async ({ page }) => {
     const links = page.locator("nav.social a");
     await expect(links).toHaveCount(SOCIAL.length);
     for (const { label, href } of SOCIAL) {
@@ -77,7 +82,7 @@ test.describe("F3: responsive rendering", () => {
 
       // Core content is visible at this width.
       await expect(page.locator("h1")).toBeVisible();
-      await expect(page.locator(".positioning")).toBeVisible();
+      await expect(page.locator(".positioning").first()).toBeVisible();
       await expect(page.locator("nav.social a").first()).toBeVisible();
 
       // No horizontal scrollbar — content fits the viewport.
