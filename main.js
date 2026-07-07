@@ -3,13 +3,85 @@
   "use strict";
 
   document.addEventListener("DOMContentLoaded", function () {
+    initDevColorPanel();
     initTheme();
     initTardis();
     initBreton();
-    initSoundCloud();
     initProjects();
     initScrollSpy();
   });
+
+  // TEMP — live look-and-feel tuner (3 sliders: background wash · panel warmth ·
+  // panel opacity). Hidden by default; summon it by adding ?tune to the URL
+  // (e.g. http://localhost:8788/?tune). Kept around so Luke can re-tune; the
+  // readout shows the exact CSS. Tunes the ACTIVE theme via inline vars —
+  // tune in light mode. Its defaults mirror the values baked into style.css.
+  function initDevColorPanel() {
+    if (!/[?&]tune\b/.test(location.search)) return;
+    var root = document.documentElement;
+    function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+    // warmth 0..100 → panel colour: neutral white → warm cream → amber.
+    function warmthRGB(w) {
+      var t = w / 100;
+      return [lerp(250, 240, t), lerp(249, 228, t), lerp(246, 200, t)];
+    }
+
+    var state = { wash: 0, warmth: 60, opacity: 50 };
+
+    var box = document.createElement("div");
+    box.className = "dev-panel";
+    var read = document.createElement("code");
+    read.className = "dev-read";
+
+    function row(label, key, min, max) {
+      var wrap = document.createElement("label");
+      wrap.className = "dev-row";
+      var span = document.createElement("span");
+      span.textContent = label;
+      var input = document.createElement("input");
+      input.type = "range";
+      input.min = min;
+      input.max = max;
+      input.value = state[key];
+      input.setAttribute("aria-label", label);
+      input.addEventListener("input", function () {
+        state[key] = Number(input.value);
+        apply();
+      });
+      wrap.appendChild(span);
+      wrap.appendChild(input);
+      box.appendChild(wrap);
+    }
+
+    function apply() {
+      var rgb = warmthRGB(state.warmth);
+      var a = (state.opacity / 100).toFixed(2);
+      var panel = "rgba(" + rgb.join(", ") + ", " + a + ")";
+      root.style.setProperty("--panel", panel);
+
+      var sa = (state.wash / 100).toFixed(2);
+      var sa2 = Math.min(1, state.wash / 100 + 0.06).toFixed(2);
+      var scrim =
+        "linear-gradient(160deg, rgba(214,190,150," + sa + ") 0%, " +
+        "rgba(184,156,116," + sa2 + ") 100%)";
+      root.style.setProperty("--scrim", scrim);
+
+      read.textContent =
+        "panel " + panel + "\nscrim wash α=" + sa +
+        "  (warmth " + state.warmth + ", opacity " + state.opacity + ")";
+    }
+
+    var title = document.createElement("div");
+    title.className = "dev-title";
+    title.textContent = "look & feel — tune, then tell me";
+    box.appendChild(title);
+    row("background wash", "wash", 0, 70);
+    row("panel warmth", "warmth", 0, 100);
+    row("panel opacity", "opacity", 30, 100);
+    box.appendChild(read);
+    document.body.appendChild(box);
+    apply();
+  }
 
   // F11: Projects wall. Entries are inlined JSON (#projects-data); render each to
   // a card. No fetch — the data is already in the DOM, so this is a pure static
@@ -80,35 +152,6 @@
     if (className) node.className = className;
     if (text != null) node.textContent = text;
     return node;
-  }
-
-  // F10: click-to-load SoundCloud. The player iframe reaches an external host,
-  // so we only inject it on interaction — nothing external loads until asked,
-  // which keeps the Lighthouse perf budget intact.
-  function initSoundCloud() {
-    var facade = document.querySelector(".soundcloud");
-    if (!facade) return;
-    var btn = facade.querySelector(".sc-play");
-    if (!btn) return;
-
-    btn.addEventListener("click", function () {
-      var url =
-        facade.getAttribute("data-sc-url") ||
-        "https://soundcloud.com/luke-hornof";
-      var frame = document.createElement("iframe");
-      frame.className = "sc-frame";
-      frame.title = "Luke Hornof on SoundCloud";
-      frame.setAttribute("loading", "lazy");
-      frame.setAttribute("allow", "autoplay");
-      frame.setAttribute("scrolling", "no");
-      frame.setAttribute("frameborder", "0");
-      frame.src =
-        "https://w.soundcloud.com/player/?url=" +
-        encodeURIComponent(url) +
-        "&color=%235a3825&auto_play=false&hide_related=true" +
-        "&show_comments=false&show_user=true&visual=false";
-      btn.replaceWith(frame);
-    });
   }
 
   // F9: Breton Easter egg — a faint fleur-de-lis revealing a nod to Brittany.
@@ -238,8 +281,12 @@
       });
     }
 
-    // A thin band a bit above the middle of the viewport is the "spy line": the
-    // section crossing it is the active one.
+    // On desktop the content panel scrolls internally (fixed-height frame); on
+    // mobile the page scrolls. Spy against whichever is the real scroll box.
+    var container = scrollContainer();
+
+    // A thin band a bit above the middle of the scroll box is the "spy line":
+    // the section crossing it is the active one.
     if ("IntersectionObserver" in window) {
       var observer = new IntersectionObserver(
         function (entries) {
@@ -247,7 +294,7 @@
             if (entry.isIntersecting) setActive(entry.target.id);
           });
         },
-        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+        { root: container, rootMargin: "-40% 0px -55% 0px", threshold: 0 }
       );
       sections.forEach(function (s) {
         observer.observe(s);
@@ -255,17 +302,42 @@
     }
 
     // Guard the extremes so the first/last section win at the very top/bottom,
-    // where the spy line may sit past the edge of the document.
+    // where the spy line may sit past the edge of the scroll box.
     var last = sections[sections.length - 1];
     var first = sections[0];
     function edgeGuard() {
-      var doc = document.documentElement;
-      var atBottom =
-        window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+      var atBottom, atTop;
+      if (container) {
+        atBottom =
+          container.scrollTop + container.clientHeight >=
+          container.scrollHeight - 2;
+        atTop = container.scrollTop <= 2;
+      } else {
+        var doc = document.documentElement;
+        atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+        atTop = window.scrollY <= 2;
+      }
       if (atBottom) setActive(last.id);
-      else if (window.scrollY <= 2) setActive(first.id);
+      else if (atTop) setActive(first.id);
     }
-    window.addEventListener("scroll", edgeGuard, { passive: true });
+    (container || window).addEventListener("scroll", edgeGuard, {
+      passive: true,
+    });
     edgeGuard(); // set initial state on load
+  }
+
+  // The scrollable ancestor of the sections, or null when the page itself
+  // scrolls (mobile). Desktop gives .content overflow-y:auto + a fixed height.
+  function scrollContainer() {
+    var content = document.querySelector(".content");
+    if (!content) return null;
+    var oy = getComputedStyle(content).overflowY;
+    if (
+      (oy === "auto" || oy === "scroll") &&
+      content.scrollHeight > content.clientHeight + 4
+    ) {
+      return content;
+    }
+    return null;
   }
 })();

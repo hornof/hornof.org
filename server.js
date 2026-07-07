@@ -1,5 +1,5 @@
 // Minimal zero-dependency static server for local dev + Playwright.
-// Serves the repo root INCLUDING dot-directories (.2013/.2024/.2025), which the
+// Serves the repo root INCLUDING dot-directories (.2013/.2025), which the
 // Python http.server and some hosts skip. Directory paths resolve to index.html.
 const http = require("http");
 const fs = require("fs");

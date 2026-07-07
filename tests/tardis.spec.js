@@ -4,7 +4,7 @@
 // the three archives; all archives reachable via it; keyboard accessible.
 const { test, expect } = require("@playwright/test");
 
-const ARCHIVES = ["/.2013/", "/.2024/", "/.2025/"];
+const ARCHIVES = ["/.2013/", "/.2025/"];
 
 test.describe("F4: Tardis time-machine", () => {
   test.beforeEach(async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe("F4: Tardis time-machine", () => {
     );
   });
 
-  test("invoking the control reveals links to all three archives", async ({
+  test("invoking the control reveals links to all archives", async ({
     page,
   }) => {
     await page.locator(".tardis-toggle").click();

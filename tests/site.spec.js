@@ -10,7 +10,6 @@ const { test, expect, request } = require("@playwright/test");
 const PAGES = [
   { path: "/", label: "current site" },
   { path: "/.2013/", label: "2013 archive" },
-  { path: "/.2024/", label: "2024 archive" },
   { path: "/.2025/", label: "2025 archive" },
 ];
 
@@ -47,7 +46,7 @@ test.describe("F1: no broken same-origin assets on any page", () => {
 test.describe("F1: archive links resolve", () => {
   test("each archive path returns 200 via direct request", async ({ baseURL }) => {
     const ctx = await request.newContext({ baseURL });
-    for (const path of ["/.2013/", "/.2024/", "/.2025/"]) {
+    for (const path of ["/.2013/", "/.2025/"]) {
       const resp = await ctx.get(path);
       expect(resp.status(), `${path} should resolve`).toBe(200);
       const html = await resp.text();

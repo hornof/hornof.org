@@ -73,13 +73,12 @@ serif "LUKE HORNOF" card), not the old site.
 
 ### 3. Check the archives serve on the preview URL
 
-The archives live in dot-prefixed folders (`.2013 .2024 .2025`). Some static
-hosts hide dot-folders. Test all three on the **preview** URL (swap in your real
+The archives live in dot-prefixed folders (`.2013 .2025`). Some static
+hosts hide dot-folders. Test both on the **preview** URL (swap in your real
 `*.pages.dev` host):
 
 ```
 https://hornof-org.pages.dev/.2013/
-https://hornof-org.pages.dev/.2024/
 https://hornof-org.pages.dev/.2025/
 ```
 
@@ -196,7 +195,7 @@ Give it a couple of minutes (TTL is 300 now), then check the real domain:
 
 - <https://hornof.org> → the **new** one-pager, over **https**, no cert warning.
 - <https://www.hornof.org> → resolves to the same site.
-- <https://hornof.org/.2013/>, `/.2024/`, `/.2025/` → each archive loads.
+- <https://hornof.org/.2013/>, `/.2025/` → each archive loads.
 
 **Verify —** all of the above load correctly. From a terminal:
 
@@ -247,7 +246,7 @@ after cutover — it's your rollback target. The archives and the old page at
 
 Only needed if Step 3 showed a 404 for any `/.YYYY/` path (Cloudflare hiding the
 dot-folders). This copies the archives to dot-free folders **at deploy time**
-(the on-disk `.2013/.2024/.2025` are never renamed) and rewrites the pretty URLs
+(the on-disk `.2013/.2025` are never renamed) and rewrites the pretty URLs
 onto them.
 
 > Note: this adds a one-line deploy copy — a small exception to the repo's
@@ -258,7 +257,7 @@ onto them.
    set:
 
    ```
-   for d in .2013 .2024 .2025; do cp -r "$d" "${d#.}"; done
+   for d in .2013 .2025; do cp -r "$d" "${d#.}"; done
    ```
 
    (Leave the output directory as `/`.)
@@ -267,7 +266,6 @@ onto them.
 
    ```
    /.2013/* /2013/:splat 200
-   /.2024/* /2024/:splat 200
    /.2025/* /2025/:splat 200
    ```
 
@@ -276,7 +274,7 @@ onto them.
 
 3. Commit `_redirects`, push to `main`, and let Pages redeploy.
 
-**Verify —** re-run Step 3: `https://<project>.pages.dev/.2013/` (and `.2024`,
+**Verify —** re-run Step 3: `https://<project>.pages.dev/.2013/` (and
 `.2025`) now load. Then continue the runbook.
 
 ---

@@ -5,14 +5,14 @@
 ## Ground rules
 - Plain HTML + one `style.css` + minimal vanilla `main.js`. No frameworks, no build step. Styling isolated in style.css (a future skin swap must touch only that file).
 - Verifier: Playwright (tests/) + GitHub Actions CI. Lighthouse budgets from F3 on: performance ≥95, accessibility ≥95.
-- Archives `.2013/.2024/.2025` are read-only — never modify their contents.
+- Archives `.2013/.2025` are read-only — never modify their contents. (`.2024` was removed 2026-07-06 at Luke's request — it duplicated 2013's landing page.)
 - Anything touching DNS/registrar: write runbooks, don't execute — those steps are Luke's.
 
 ## Features (ranked)
 
 ### F1 — [x] Port the current site + archives
 Fetch the live hornof.org (current one-pager) and its archive versions; commit verbatim into the repo layout. Cloudflare Pages config ready (`wrangler.toml` or Pages defaults documented in README).
-*Accept:* local serve renders identically to production; archive paths `/.2013/ /.2024/ /.2025/` load; Playwright test proves all four render + archive links resolve.
+*Accept:* local serve renders identically to production; archive paths `/.2013/ /.2025/` load; Playwright test proves the root + archives render + archive links resolve.
 
 ### F2 — [x] DNS cutover runbook
 `RUNBOOK-dns.md`: Cloudflare account + Pages project steps, DNS record import, TTL-lowering, nameserver switch at Dotster, rollback, auto-renew checklist. Luke-executable, numbered, no step assumes prior Cloudflare knowledge.
