@@ -142,7 +142,7 @@ body::after {
 @media (min-width: 880px) {
     .layout {
         display: grid;
-        grid-template-columns: minmax(300px, 42%) 1fr;
+        grid-template-columns: minmax(300px, 36%) 1fr;
         gap: 1.25rem; /* panorama peeks through the gutter between panels */
         align-items: start;
         height: 100vh; /* lock both frames to the viewport */
@@ -285,17 +285,24 @@ body::after {
     padding-top: 0;
 }
 
+/* Section headings echo the sidebar's uppercase labels: the caps carry the
+   emphasis, so the size stays close to body copy (1.15rem) — just a hair
+   larger — instead of competing with the name and tagline in the sidebar. */
 .content h2 {
     margin: 0 0 1rem;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: normal;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
+/* Paragraphs and list items inherit the section's single measure (42rem)
+   rather than each carrying a tighter cap — otherwise headings, lists, and
+   paragraphs stop at three different right edges inside the wide content
+   pane, giving a ragged right margin that floats far from the pane edge. */
 .content section p {
     margin: 0;
     font-size: 1.15rem;
-    max-width: 34rem;
 }
 
 .content a {
@@ -313,7 +320,6 @@ body::after {
 
 .cv li {
     margin-bottom: 1.1rem;
-    max-width: 36rem;
 }
 
 .cv-role {
@@ -336,7 +342,6 @@ body::after {
 .pubs li,
 .talks li {
     margin-bottom: 0.9rem;
-    max-width: 36rem;
     font-size: 1.05rem;
 }
 
