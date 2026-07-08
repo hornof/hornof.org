@@ -4,7 +4,7 @@
 // section in view; keyboard navigable; single column on mobile.
 const { test, expect } = require("@playwright/test");
 
-const SECTIONS = ["about", "experience", "publications", "talks", "contact"];
+const SECTIONS = ["about", "experience", "publications", "talks", "projects"];
 
 test.describe("F5: sidebar layout", () => {
   test("desktop: sidebar sits left of the content and stays put on scroll", async ({
@@ -66,7 +66,7 @@ test.describe("F5: scroll-spy nav", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
 
-    for (const id of ["talks", "publications", "contact"]) {
+    for (const id of ["talks", "publications", "projects"]) {
       // Drive by real scrolling — active state must come from scroll position,
       // not from any click handler.
       await page.evaluate((sid) => {

@@ -8,15 +8,20 @@ const { test, expect, request } = require("@playwright/test");
 const fs = require("fs");
 
 test.describe("F11: reachable from the site", () => {
-  test('a "Projects" nav link points at the wall', async ({ page }) => {
+  test("Projects is an on-page section that links out to the wall", async ({ page }) => {
     await page.goto("/");
-    const link = page.locator('.section-nav a[href*="projects"]');
-    await expect(link).toHaveCount(1);
-    await expect(link).toHaveText(/projects/i);
+    // Projects is now an in-page nav anchor (like the other sections), not a page link.
+    const navLink = page.locator('.section-nav a[href="#projects"]');
+    await expect(navLink).toHaveCount(1);
+    await expect(navLink).toHaveText(/projects/i);
+    await expect(page.locator("section#projects")).toHaveCount(1);
 
+    // The section carries the outbound link to the full wall — and it resolves live.
+    const wallLink = page.locator('#projects a[href="projects.html"]');
+    await expect(wallLink).toHaveCount(1);
     const resp = await Promise.all([
       page.waitForNavigation(),
-      link.click(),
+      wallLink.click(),
     ]).then(([nav]) => nav);
     expect(resp && resp.status(), "projects page status").toBe(200);
     await expect(page).toHaveURL(/projects/);

@@ -11,7 +11,7 @@ test.describe("F6: real section content", () => {
   });
 
   test("every section has a heading and real body copy", async ({ page }) => {
-    for (const id of ["about", "experience", "publications", "talks", "contact"]) {
+    for (const id of ["about", "experience", "publications", "talks", "projects"]) {
       const section = page.locator(`#${id}`);
       await expect(section.locator("h2")).toBeVisible();
       const text = (await section.innerText()).trim();
