@@ -1,0 +1,278 @@
+---
+// V2 — the site-wide shell: the persistent identity/nav sidebar + the routed
+// page's content. Composes BaseLayout (the pure document shell) so BaseLayout
+// stays responsible only for <head>, the panorama, and the theme toggle.
+//
+// The sidebar is marked transition:persist="sidebar" and its SSR markup is
+// byte-identical on every route (no per-page active class in the HTML — active
+// state is applied client-side after load). Because every page renders the same
+// sidebar node, the persisted node carries across each view-transition swap and
+// never re-mounts or flashes.
+import BaseLayout from "./BaseLayout.astro";
+
+export interface Props {
+  title: string;
+  description?: string;
+  bodyClass?: string;
+  /** Passed through to BaseLayout for the document-level asset hrefs. */
+  assetBase?: string;
+  noindex?: boolean;
+}
+
+const { title, description, bodyClass, assetBase = "", noindex = false } =
+  Astro.props;
+
+// Every real page is served from the site root, so the sidebar's own asset
+// hrefs are absolute ("/work/img/…"). Absolute keeps the sidebar SSR markup
+// identical on every route — including 404, which a host may serve under any
+// path — so the persisted node always matches.
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  bodyClass={bodyClass}
+  assetBase={assetBase}
+  noindex={noindex}
+>
+  <div class="layout">
+    {/* Persistent identity/nav sidebar — identical on every route, persisted so
+        it never re-renders or flashes on navigation. No active class in the SSR
+        markup; the script below applies it client-side per route. */}
+    <header class="sidebar" transition:persist="sidebar">
+      <div class="intro">
+        <h1 class="name"><a href="/">Luke Hornof</a></h1>
+        <p class="tagline">AI Engineering Leader</p>
+        <p class="positioning">Founder, researcher, agentic engineer.</p>
+        <p class="positioning">
+          Vision: amazing teams, successful products, happy customers.
+        </p>
+      </div>
+
+      <nav class="section-nav" aria-label="Sections">
+        <a href="/#about">About</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#publications">Publications</a>
+        <a href="/#talks">Talks</a>
+        <a href="/#projects">Projects</a>
+      </nav>
+
+      <nav class="social" aria-label="Social profiles">
+        <a href="https://www.linkedin.com/in/lukehornof" aria-label="LinkedIn">
+          <img src="/work/img/linkedin-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a
+          href="https://scholar.google.com/citations?user=Al_FuxQAAAAJ"
+          aria-label="Google Scholar"
+        >
+          <img src="/work/img/google-scholar-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://x.com/hornof/" aria-label="X">
+          <img src="/work/img/x-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://github.com/hornof/" aria-label="GitHub">
+          <img src="/work/img/github-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://facebook.com/lukehornof/" aria-label="Facebook">
+          <img src="/work/img/facebook-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://instagram.com/lukehornof/" aria-label="Instagram">
+          <img src="/work/img/instagram-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://soundcloud.com/luke-hornof" aria-label="SoundCloud">
+          <img src="/work/img/soundcloud-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+      </nav>
+    </header>
+
+    <slot />
+  </div>
+
+  <script>
+    // V2 — sidebar nav active state, driven by astro:page-load so it runs on the
+    // first load AND after every view-transition swap (module scripts don't
+    // re-execute on swap; the F16 lesson). The sidebar node itself is persisted,
+    // so this only re-computes which link is marked — it never rebuilds the DOM.
+    //
+    //   /            → scroll-spy over the home sections.
+    //   /projects.html, /built-with.html, /eclipse-built.html
+    //                → mark "Projects" current (these are Projects-area pages).
+    //   anything else (404) → no link marked.
+
+    // Live scroll-spy handles, torn down and rebuilt on each page-load so an
+    // observer/listener from a prior route never fires on detached nodes.
+    let spyObserver: IntersectionObserver | null = null;
+    let spyScrollTarget: Element | Window | null = null;
+    let spyOnScroll: (() => void) | null = null;
+    let spyWindowBound = false;
+
+    // The section-nav anchors that point at an in-page section on THIS page.
+    // Hrefs are absolute ("/#about"); resolve each to its hash and keep only the
+    // ones whose target element exists here (all five on home, none elsewhere).
+    function sectionLinks() {
+      return Array.prototype.slice
+        .call(document.querySelectorAll<HTMLAnchorElement>(".section-nav a"))
+        .map((a) => {
+          let hash = "";
+          try {
+            hash = new URL(a.href).hash; // "#about"
+          } catch (e) {
+            hash = "";
+          }
+          return { a, hash, id: hash ? hash.slice(1) : "" };
+        })
+        .filter((x) => x.id && document.getElementById(x.id));
+    }
+
+    function clearActive() {
+      document.querySelectorAll(".section-nav a").forEach((a) => {
+        a.classList.remove("active");
+        a.removeAttribute("aria-current");
+      });
+    }
+
+    function markLink(predicate: (a: HTMLAnchorElement) => boolean) {
+      let hit = false;
+      document
+        .querySelectorAll<HTMLAnchorElement>(".section-nav a")
+        .forEach((a) => {
+          const on = predicate(a);
+          a.classList.toggle("active", on);
+          if (on) {
+            a.setAttribute("aria-current", "true");
+            hit = true;
+          } else {
+            a.removeAttribute("aria-current");
+          }
+        });
+      return hit;
+    }
+
+    function isHome() {
+      const p = location.pathname;
+      return p === "/" || p.endsWith("/index.html") || p === "/index.html";
+    }
+
+    // The scrollable ancestor of the home sections, or null when the page itself
+    // scrolls (mobile). Desktop gives .content overflow-y:auto + a fixed height.
+    function scrollContainer(): Element | null {
+      const content = document.querySelector(".content");
+      if (!content) return null;
+      const oy = getComputedStyle(content).overflowY;
+      if (
+        (oy === "auto" || oy === "scroll") &&
+        content.scrollHeight > content.clientHeight + 4
+      ) {
+        return content;
+      }
+      return null;
+    }
+
+    function teardownSpy() {
+      if (spyObserver) spyObserver.disconnect();
+      spyObserver = null;
+      if (spyScrollTarget && spyOnScroll) {
+        spyScrollTarget.removeEventListener("scroll", spyOnScroll);
+      }
+      spyScrollTarget = null;
+      spyOnScroll = null;
+    }
+
+    function initScrollSpy() {
+      const links = sectionLinks();
+      if (!links.length) return false;
+      const sections = links.map((l) => document.getElementById(l.id)!);
+
+      function setActive(id: string) {
+        links.forEach(({ a, id: linkId }) => {
+          const on = linkId === id;
+          a.classList.toggle("active", on);
+          if (on) a.setAttribute("aria-current", "true");
+          else a.removeAttribute("aria-current");
+        });
+      }
+
+      const container = scrollContainer();
+      if ("IntersectionObserver" in window) {
+        spyObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) setActive((entry.target as HTMLElement).id);
+            });
+          },
+          { root: container, rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+        );
+        sections.forEach((s) => spyObserver!.observe(s));
+      }
+
+      const first = sections[0];
+      const last = sections[sections.length - 1];
+      function edgeGuard() {
+        const box = scrollContainer();
+        let atBottom: boolean, atTop: boolean;
+        if (box) {
+          atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
+          atTop = box.scrollTop <= 2;
+        } else {
+          const doc = document.documentElement;
+          atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+          atTop = window.scrollY <= 2;
+        }
+        if (atBottom) setActive(last.id);
+        else if (atTop) setActive(first.id);
+      }
+
+      spyScrollTarget = container || window;
+      spyOnScroll = edgeGuard;
+      spyScrollTarget.addEventListener("scroll", spyOnScroll, { passive: true });
+      edgeGuard();
+
+      if (!spyWindowBound) {
+        spyWindowBound = true;
+        window.addEventListener("load", () => spyOnScroll && spyOnScroll());
+        window.addEventListener(
+          "resize",
+          () => spyOnScroll && spyOnScroll(),
+          { passive: true }
+        );
+      }
+      return true;
+    }
+
+    // When we land on home carrying a hash (e.g. a section link clicked from a
+    // subpage), scroll that section into view. On desktop the sections live
+    // inside .content's own scroll box, so a plain browser hash-scroll (which
+    // scrolls the window) can miss — scrollIntoView finds the right ancestor.
+    function scrollToHash() {
+      if (!location.hash) return;
+      const el = document.getElementById(location.hash.slice(1));
+      if (el) el.scrollIntoView({ block: "start" });
+    }
+
+    function init() {
+      teardownSpy();
+      if (isHome()) {
+        clearActive();
+        scrollToHash();
+        initScrollSpy();
+      } else {
+        // Current-page marker: Projects-area pages light the Projects nav link.
+        const p = location.pathname;
+        const projectsArea =
+          /(^|\/)(projects|built-with|eclipse-built)\.html$/.test(p);
+        clearActive();
+        if (projectsArea) {
+          markLink((a) => {
+            try {
+              return new URL(a.href).hash === "#projects";
+            } catch (e) {
+              return false;
+            }
+          });
+        }
+      }
+    }
+
+    document.addEventListener("astro:page-load", init);
+  </script>
+</BaseLayout>

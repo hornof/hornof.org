@@ -1,19 +1,18 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import MainLayout from "../layouts/MainLayout.astro";
 ---
 
-<BaseLayout
+<MainLayout
   title="How eclipse-sim was built — Luke Hornof"
   description="How a one-page brief became a working eclipse predictor overnight — and what the debugging afterward taught about testing agent-built software."
   bodyClass="page-fixed"
 >
   {/* Provenance page for the eclipse-sim project. Sources: the repo's
       ROADMAP.md (the brief), LOG.md (iterations), WALL.md (numbers),
-      LESSONS.md (the debugging story). */}
+      LESSONS.md (the debugging story). V2: shared MainLayout shell; back-link
+      retired (the persistent sidebar nav is the path back). */}
   <main class="colophon">
-    <p class="colophon-back"><a href="projects.html">&larr; Projects</a></p>
-
-    <h1>How eclipse-sim was built</h1>
+    <h2 class="page-title">How eclipse-sim was built</h2>
 
     <p>
       {/* F16: passthrough app, not an Astro page — full reload, no SPA swap. */}
@@ -110,4 +109,4 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       > runs right here on this site.
     </p>
   </main>
-</BaseLayout>
+</MainLayout>
