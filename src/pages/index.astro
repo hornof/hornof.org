@@ -1,5 +1,20 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+// F17 (E3.1): the CV sections are data now — typed content collections rendered
+// at build time. getCollection() gives no order guarantee, so sort on the
+// authored `order`. The prose sections (About, the Projects teaser) stay inline;
+// only the list-shaped content moved to collections.
+const experience = (await getCollection("experience")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const publications = (await getCollection("publications")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const talks = (await getCollection("talks")).sort(
+  (a, b) => a.data.order - b.data.order
+);
 ---
 
 <BaseLayout
@@ -87,90 +102,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <section id="experience">
         <h2>Experience</h2>
         <ul class="cv">
-          <li>
-            <span class="cv-role">CTO, ThirdLaw</span>
-            <span class="cv-when">2025–2026</span><span class="cv-what"
-              >Runtime AI safety: observability and governance for LLM and agent
-              behavior in the enterprise.</span
-            >
-          </li>
-          <li>
-            <span class="cv-role">VP of Engineering, TensorWave</span>
-            <span class="cv-when">2024</span><span class="cv-what"
-              >Engineering, recruiting, and datacenter/SaaS operations.</span
-            >
-          </li>
-          <li>
-            <span class="cv-role">AI Engineering &amp; Leadership, consulting</span>
-            <span class="cv-when">2023–2025</span><span class="cv-what"
-              >Advised companies and investors; engagements including DE Shaw and
-              GLG.</span
-            >
-          </li>
-          <li>
-            <span class="cv-role">Senior Director, Product, Akridata</span>
-            <span class="cv-when">2022–2023</span><span class="cv-what"
-              >Integrated Luminide's IDE; led GTM and community (Kaggle, ML
-              Commons).</span
-            >
-          </li>
-          <li>
-            <span class="cv-role">Co-founder &amp; CEO, Luminide</span>
-            <span class="cv-when">2020–2022</span><span class="cv-what"
-              >AI tools for model accuracy and lower training cost; acquired by
-              Akridata.</span
-            >
-          </li>
-          <li>
-            <span class="cv-role">Director of AI Software, Intel</span>
-            <span class="cv-when">2016–2019</span><span class="cv-what"
-              >Grew the team from 10 to 150 across four countries; three AI chip
-              bring-ups; co-developed Flexpoint.</span
-            >
-          </li>
-          <li>
-            <span class="cv-role">Director of AI Software, Nervana</span>
-            <span class="cv-when">2014–2016</span><span class="cv-what"
-              >Founded the software team for the first AI hardware accelerator;
-              acquired by Intel.</span
-            >
-          </li>
+          {
+            experience.map((e) => (
+              <li>
+                <span class="cv-role">{e.data.role}, {e.data.org}</span>
+                <span class="cv-when">{e.data.when}</span><span class="cv-what">{e.data.what}</span>
+              </li>
+            ))
+          }
         </ul>
       </section>
 
       <section id="publications">
         <h2>Publications &amp; Patents</h2>
         <ul class="pubs">
-          <li>
-            <a href="https://arxiv.org/abs/1711.02213"
-              >Flexpoint: An Adaptive Numerical Format for Efficient Training of
-              Deep Neural Networks</a
-            > — NeurIPS, 2017.
-          </li>
-          <li>
-            <a href="https://patents.google.com/patent/US10552119B2/en"
-              >Dynamic Management of Numerical Representation in a Distributed
-              Matrix Processor Architecture</a
-            > — U.S. Patent 10,552,119.
-          </li>
-          <li>
-            <a href="https://patents.google.com/patent/US20230196108A1/en"
-              >Expedited Assessment and Ranking of Model Quality in Machine
-              Learning</a
-            > — U.S. Patent Application 17/560,422.
-          </li>
-          <li>
-            <a
-              href="https://www.wiley.com/en-us/Real+Time+Analytics%3A+Techniques+to+Analyze+and+Visualize+Streaming+Data-p-9781118837917"
-              >Real-time Analytics: Techniques to Analyze and Visualize Streaming
-              Data</a
-            > — Byron Ellis, edited by Luke Hornof. Wiley, 2014.
-          </li>
-          <li>
-            <a href="https://doi.org/10.1017/S0956796802004598"
-              >Compiling for Template-based Run-time Code Generation</a
-            > — Journal of Functional Programming 13(3), 2003.
-          </li>
+          {
+            publications.map((p) => (
+              <li>
+                <a href={p.data.href}>{p.data.title}</a> — {p.data.cite}
+              </li>
+            ))
+          }
         </ul>
         <p class="more">
           <a href="https://scholar.google.com/citations?user=Al_FuxQAAAAJ"
@@ -186,10 +138,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           meetups and founder events. Recent topics:
         </p>
         <ul class="talks">
-          <li>Building Amazing Engineering Teams</li>
-          <li>Bootstrapping a Startup — the Luminide story</li>
-          <li>Company Models — the AI OS for Companies</li>
-          <li>The Times They Are AI-Changin'</li>
+          {talks.map((t) => <li>{t.data.title}</li>)}
         </ul>
       </section>
 

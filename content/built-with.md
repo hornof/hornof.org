@@ -1,14 +1,16 @@
 # Built with
 
-> Source copy for `built-with.html`, inlined by hand (no build step), same as the
-> section content under `content/`.
+> Source copy for `built-with.html`. Rendered by `src/pages/built-with.astro`;
+> the CV/section content is now data in the `content/` collections.
 
-This site is deliberately small. No framework, no build step, no tracking — just
-three files served as static assets: one `index.html`, one `style.css` that holds
-the entire look (so a future re-skin touches nothing else), and about a hundred
-lines of dependency-free `main.js` for the scroll-spy, the time-machine, and the
-theme toggle. It's hosted on **Cloudflare Pages**, deployed straight from a
-`git push`.
+This site is deliberately small — and still ships no tracking. It's built with
+**Astro**: pages and layouts compose from small components, the content —
+projects, talks, experience — lives in typed content collections, and a single
+`style.css` holds the entire look, so a future re-skin touches nothing else. The
+interactivity is a handful of tiny vanilla scripts: the scroll-spy, the
+time-machine, the theme toggle, and the breathing panorama. `astro build`
+compiles it all to static HTML, hosted on **Cloudflare Pages** and deployed
+straight from a `git push`.
 
 The more unusual part is how it was built. hornof.org was rebuilt as the first
 real lane of an **agentic engineering loop**: an approved product spec and

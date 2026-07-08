@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Flexpoint: An Adaptive Numerical Format for Efficient Training of Deep Neural Networks",
+    "href": "https://arxiv.org/abs/1711.02213",
+    "cite": "NeurIPS, 2017."
+  },
+  {
+    "title": "Dynamic Management of Numerical Representation in a Distributed Matrix Processor Architecture",
+    "href": "https://patents.google.com/patent/US10552119B2/en",
+    "cite": "U.S. Patent 10,552,119."
+  },
+  {
+    "title": "Expedited Assessment and Ranking of Model Quality in Machine Learning",
+    "href": "https://patents.google.com/patent/US20230196108A1/en",
+    "cite": "U.S. Patent Application 17/560,422."
+  },
+  {
+    "title": "Real-time Analytics: Techniques to Analyze and Visualize Streaming Data",
+    "href": "https://www.wiley.com/en-us/Real+Time+Analytics%3A+Techniques+to+Analyze+and+Visualize+Streaming+Data-p-9781118837917",
+    "cite": "Byron Ellis, edited by Luke Hornof. Wiley, 2014."
+  },
+  {
+    "title": "Compiling for Template-based Run-time Code Generation",
+    "href": "https://doi.org/10.1017/S0956796802004598",
+    "cite": "Journal of Functional Programming 13(3), 2003."
+  }
+]

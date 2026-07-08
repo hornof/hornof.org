@@ -1,20 +1,28 @@
 # hornof.org
 
-Personal site for Luke Hornof — plain HTML + one CSS file + minimal vanilla JS, no
-build step, no framework. Hosted on Cloudflare Pages. See `ROADMAP.md` for the
-phased rebuild plan.
+Personal site for Luke Hornof — built with [Astro](https://astro.build/) (static
+output), one global `style.css` for the whole look, typed content collections for
+the data, and a handful of tiny vanilla scripts for the interactivity. `astro
+build` compiles it to static HTML, hosted on Cloudflare Pages. See `ROADMAP.md`
+for the record of the original static build and `ROADMAP-astro.md` for the Astro
+rebuild (Phase 6).
 
 ## Layout
 
 ```
-index.html            # the site — F3 minimal-core one-pager
-style.css             # all styling, isolated here (a skin swap touches only this file)
-work/img/             # brown social icons + favicon (still referenced by index.html)
-work/                 # legacy current-site assets (css/fonts/js) — kept for the /.2025 archive
-.2013/                # archive: the original Homestead multi-page site (2013 snapshot)
-.2025/                # archive: the current GenAI rebuild, 2025 snapshot
-server.js             # zero-dep static server for local dev + tests (serves dot-dirs)
-tests/                # Playwright acceptance tests
+astro.config.mjs      # Astro static build, flat .html routes, preview port
+src/
+  layouts/            # BaseLayout — <head>, panorama, theme toggle, ClientRouter
+  pages/              # index / projects / built-with / eclipse-built / 404
+  content.config.ts   # zod-typed content collections (projects, experience, …)
+content/              # the site's data: projects.json + experience/publications/talks
+public/               # copied to dist/ verbatim — the passthrough zone
+  style.css           # all styling, isolated here (a skin swap touches only this file)
+  work/img/           # brown social icons + favicon + panorama
+  .2013/              # archive: the original Homestead multi-page site (2013 snapshot)
+  .2025/              # archive: the current GenAI rebuild, 2025 snapshot
+  projects/eclipse/   # the eclipse-sim Three.js app (static passthrough)
+tests/                # Playwright acceptance tests (run against the built site)
 playwright.config.js
 wrangler.toml         # Cloudflare Pages config
 ```
@@ -26,24 +34,31 @@ are committed verbatim.
 ## Local development
 
 ```bash
-npm install                 # first time only (Playwright)
+npm install                 # first time only (Astro + Playwright)
 npm run test:install        # first time only — install the Chromium browser
-npm run serve               # http://localhost:8788
-npm test                    # run the Playwright acceptance suite
+npm run dev                 # Astro dev server (hot reload)
+npm run build               # compile to dist/
+npm run preview             # serve the built dist/ at http://localhost:8788
+npm test                    # run the Playwright acceptance suite (builds + previews first)
 ```
 
-`server.js` serves the repo root including the dot-prefixed archive directories,
-which `python -m http.server` and some hosts skip.
+Astro copies `public/` to `dist/` verbatim — including the dot-prefixed archive
+directories (`.2013/ .2025/`), which `python -m http.server` and some hosts skip.
+The Playwright suite runs against the built site via `npm run preview`.
 
 ## Deploy (Cloudflare Pages)
 
-No build command. Settings:
+Astro is a static build, so Cloudflare Pages runs the build command and publishes
+`dist/`. Settings:
 
-- **Build command:** _(none)_
-- **Build output directory:** `/` (repo root)
+- **Build command:** `npm run build`
+- **Build output directory:** `dist/`
 - **Production branch:** `main` — every PR gets a preview URL automatically.
 
-`wrangler.toml` captures this (`pages_build_output_dir = "."`).
+> Merge-time ordering (Luke's infra step): flip the Pages build command to
+> `npm run build` / publish `dist/` **before** merging the Astro rebuild to
+> `main`. Merge-first would have Pages build `main` with the old no-build config
+> and publish raw `src/` to the live URL. See `LOG-astro.md`.
 
 ### Go-live
 

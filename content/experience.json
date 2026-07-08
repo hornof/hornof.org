@@ -1,0 +1,44 @@
+[
+  {
+    "role": "CTO",
+    "org": "ThirdLaw",
+    "when": "2025–2026",
+    "what": "Runtime AI safety: observability and governance for LLM and agent behavior in the enterprise."
+  },
+  {
+    "role": "VP of Engineering",
+    "org": "TensorWave",
+    "when": "2024",
+    "what": "Engineering, recruiting, and datacenter/SaaS operations."
+  },
+  {
+    "role": "AI Engineering & Leadership",
+    "org": "consulting",
+    "when": "2023–2025",
+    "what": "Advised companies and investors; engagements including DE Shaw and GLG."
+  },
+  {
+    "role": "Senior Director, Product",
+    "org": "Akridata",
+    "when": "2022–2023",
+    "what": "Integrated Luminide's IDE; led GTM and community (Kaggle, ML Commons)."
+  },
+  {
+    "role": "Co-founder & CEO",
+    "org": "Luminide",
+    "when": "2020–2022",
+    "what": "AI tools for model accuracy and lower training cost; acquired by Akridata."
+  },
+  {
+    "role": "Director of AI Software",
+    "org": "Intel",
+    "when": "2016–2019",
+    "what": "Grew the team from 10 to 150 across four countries; three AI chip bring-ups; co-developed Flexpoint."
+  },
+  {
+    "role": "Director of AI Software",
+    "org": "Nervana",
+    "when": "2014–2016",
+    "what": "Founded the software team for the first AI hardware accelerator; acquired by Intel."
+  }
+]

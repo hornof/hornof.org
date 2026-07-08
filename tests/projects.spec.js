@@ -7,6 +7,13 @@
 const { test, expect, request } = require("@playwright/test");
 const fs = require("fs");
 
+// F17: the wall is generated at build time from the `projects` content
+// collection — there is no longer an inlined #projects-data island to read the
+// expected set off the page. The source of truth is the on-disk collection, so
+// tests that need the entry list read it straight from there.
+const SOURCE = () =>
+  JSON.parse(fs.readFileSync("content/projects/projects.json", "utf-8"));
+
 test.describe("F11: reachable from the site", () => {
   test("Projects is an on-page section that links out to the wall", async ({ page }) => {
     await page.goto("/");
@@ -50,11 +57,10 @@ test.describe("F11: the wall renders", () => {
     ).toHaveCount(1);
   });
 
-  test("renders one card per entry in the inlined JSON data", async ({
+  test("renders one card per source-collection entry", async ({
     page,
   }) => {
-    const data = await page.locator("#projects-data").textContent();
-    const entries = JSON.parse(data || "[]");
+    const entries = SOURCE();
     expect(Array.isArray(entries), "data is an array").toBeTruthy();
     expect(entries.length, "has at least one entry").toBeGreaterThanOrEqual(1);
 
@@ -65,8 +71,7 @@ test.describe("F11: the wall renders", () => {
   test("each card shows its title, blurb, date and build line", async ({
     page,
   }) => {
-    const data = await page.locator("#projects-data").textContent();
-    const entries = JSON.parse(data || "[]");
+    const entries = SOURCE();
 
     for (const entry of entries) {
       const card = page.locator(`.project-card[data-slug="${entry.slug}"]`);
@@ -153,8 +158,7 @@ test.describe("F12: dogfood entry", () => {
     page,
     baseURL,
   }) => {
-    const data = await page.locator("#projects-data").textContent();
-    const entries = JSON.parse(data || "[]");
+    const entries = SOURCE();
     const hrefs = entries.flatMap((e) => (e.links || []).map((l) => l.href));
     expect(hrefs.length, "entries carry links").toBeGreaterThanOrEqual(1);
 
@@ -185,43 +189,52 @@ test.describe("F12: dogfood entry", () => {
 });
 
 // F13 — Self-documenting convention: entries are pure data, so a new build adds
-// itself by appending one object; the schema is documented; source stays in sync.
+// itself by appending one object; the schema is documented.
+//
+// F17: the wall is now generated at build time from the `projects` collection
+// (no inlined JSON island, no client render), so the old "inject an entry into
+// #projects-data and watch a card appear" test — and the sync test that guarded
+// the hand-copied island — are both gone. In their place, the data-driven
+// guarantee is proven as a bijection between the source collection and the
+// rendered cards: the card set is exactly the entry set, every field sourced
+// from data, no per-entry layout code. Appending one object therefore yields
+// exactly one more card with its fields, touching nothing else.
 test.describe("F13: self-documenting convention", () => {
-  test("a new entry in the data alone renders a card — no layout code touched", async ({
+  test("the wall is a pure projection of the collection (data drives every card)", async ({
     page,
   }) => {
-    const fixture = {
-      slug: "fixture-demo",
-      title: "Fixture Build",
-      blurb: "A second entry, added as data only, proving the wall is data-driven.",
-      date: "2026-08",
-      links: [{ label: "Home", href: "/" }],
-      build: { stack: "Test stack", agents: "Claude Code", tests: 1 },
-    };
-    // Intercept the page and append one entry to the inlined JSON — nothing else.
-    // Capture the real entry count so the assertion stays correct as entries are
-    // added to projects.json (was hardcoded to 2 and broke when a 2nd real entry landed).
-    let realCount = 0;
-    await page.route("**/projects.html", async (route) => {
-      const resp = await route.fetch();
-      const html = (await resp.text()).replace(
-        /(<script type="application\/json" id="projects-data">)([\s\S]*?)(<\/script>)/,
-        (_m, open, json, close) => {
-          const arr = JSON.parse(json);
-          realCount = arr.length;
-          arr.push(fixture);
-          return open + "\n" + JSON.stringify(arr, null, 2) + "\n" + close;
-        }
-      );
-      await route.fulfill({ response: resp, body: html, contentType: "text/html" });
-    });
-
     await page.goto("/projects.html");
-    await expect(page.locator(".project-card")).toHaveCount(realCount + 1);
-    const card = page.locator('.project-card[data-slug="fixture-demo"]');
-    await expect(card).toContainText("Fixture Build");
-    await expect(card.locator(".project-build")).toContainText("Test stack");
-    await expect(card.locator('.project-links a[href="/"]')).toHaveCount(1);
+    const entries = SOURCE();
+
+    // 1. Bijection on count: no card without an entry, no entry without a card.
+    await expect(page.locator(".project-card")).toHaveCount(entries.length);
+
+    // 2. Every rendered card's slug is a source slug (no invented cards).
+    const renderedSlugs = await page
+      .locator(".project-card")
+      .evaluateAll((els) => els.map((e) => e.getAttribute("data-slug")));
+    const sourceSlugs = entries.map((e) => e.slug);
+    expect([...renderedSlugs].sort()).toEqual([...sourceSlugs].sort());
+
+    // 3. Every entry's fields + links are rendered in its card — the card is a
+    //    pure function of the data, so a new entry needs no new layout code.
+    for (const entry of entries) {
+      const card = page.locator(`.project-card[data-slug="${entry.slug}"]`);
+      await expect(card).toHaveCount(1);
+      await expect(card).toContainText(entry.title);
+      await expect(card).toContainText(entry.blurb);
+      await expect(card.locator(".project-date")).toContainText(entry.date);
+      if (entry.build && entry.build.stack) {
+        await expect(card.locator(".project-build")).toContainText(
+          entry.build.stack
+        );
+      }
+      for (const l of entry.links || []) {
+        await expect(
+          card.locator(`.project-links a[href="${l.href}"]`)
+        ).toHaveCount(1);
+      }
+    }
   });
 
   test("the entry schema + close-on-merge convention is documented", () => {
@@ -232,25 +245,5 @@ test.describe("F13: self-documenting convention", () => {
       expect(readme, `documents "${field}"`).toContain(field);
     }
     expect(readme, "documents the close-on-merge step").toMatch(/close-on-merge|on merge/);
-  });
-
-  test("the source JSON and the inlined page data stay in sync", () => {
-    // Astro-port note: the wall is now generated by src/pages/projects.astro,
-    // which inlines the #projects-data block straight from an import of
-    // content/projects/projects.json — so they're in lockstep by construction.
-    // This check reads the BUILT output (dist/projects.html) to prove the inlined
-    // block still matches the source JSON. (dist/ exists because the webServer
-    // runs `npm run build` before the suite.) The F17 phase retires this test
-    // along with the inline-JSON approach.
-    const src = JSON.stringify(
-      JSON.parse(fs.readFileSync("content/projects/projects.json", "utf-8"))
-    );
-    const html = fs.readFileSync("dist/projects.html", "utf-8");
-    const m = html.match(
-      /<script type="application\/json" id="projects-data">([\s\S]*?)<\/script>/
-    );
-    expect(m, "inlined data block present").toBeTruthy();
-    const inlined = JSON.stringify(JSON.parse(m[1]));
-    expect(inlined, "inlined data == content/projects/projects.json").toBe(src);
   });
 });

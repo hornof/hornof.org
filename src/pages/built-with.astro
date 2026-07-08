@@ -14,13 +14,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <h1>Built with</h1>
 
     <p>
-      This site is deliberately small. No framework, no build step, no tracking —
-      just three files served as static assets: one <code>index.html</code>, one
-      <code>style.css</code> that holds the entire look (so a future re-skin touches
-      nothing else), and about a hundred lines of dependency-free <code>main.js</code
-      > for the scroll-spy, the time-machine, and the theme toggle. It's hosted on
-      <a href="https://pages.cloudflare.com/">Cloudflare Pages</a>, deployed straight
-      from a <code>git push</code>.
+      This site is deliberately small — and still ships no tracking. It's built
+      with <a href="https://astro.build/">Astro</a>: pages and layouts compose from
+      small components, the content — projects, talks, experience — lives in typed
+      content collections, and a single <code>style.css</code> holds the entire look,
+      so a future re-skin touches nothing else. The interactivity is a handful of
+      tiny vanilla scripts: the scroll-spy, the time-machine, the theme toggle, and
+      the breathing panorama. <code>astro build</code> compiles it all to static
+      HTML, hosted on <a href="https://pages.cloudflare.com/">Cloudflare Pages</a>
+      and deployed straight from a <code>git push</code>.
     </p>
 
     <p>

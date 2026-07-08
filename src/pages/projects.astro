@@ -1,13 +1,36 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import projects from "../../content/projects/projects.json";
+import { getCollection } from "astro:content";
 
-// The wall stays data-driven and client-rendered for parity (F15): the entries
-// are inlined as JSON and turned into cards by initProjects() below — no fetch,
-// so it's still a pure static page with zero runtime request. Content collections
-// + build-time rendering are a later phase (F17). Inlining from the imported JSON
-// also keeps it in lockstep with content/projects/projects.json by construction.
-const projectsJson = JSON.stringify(projects);
+// F17 (E3.1): the wall is generated at build time from the `projects` content
+// collection — no inlined JSON, no client-side render. getCollection() gives no
+// order guarantee, so sort by the `order` stamped on each record (authored
+// sequence). A new build is one object appended to content/projects/projects.json;
+// zod (src/content.config.ts) type-checks it and this template renders the card.
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+// The archives (/.20xx/) and the eclipse app (/projects/eclipse/) are static
+// passthrough docs, not Astro pages — opt their links out of the SPA swap so
+// they load fully (matches F16's data-astro-reload handling elsewhere).
+const isPassthrough = (href: string) =>
+  /(^|\/)\.20\d\d\//.test(href) || /projects\/eclipse\//.test(href);
+
+// The "how it was built" line — the differentiator, shown not hidden.
+function buildBits(b: {
+  stack?: string;
+  agents?: string;
+  tests?: number;
+  firstPassGreen?: string | boolean;
+}) {
+  const bits: string[] = [];
+  if (b.stack) bits.push(b.stack);
+  if (b.agents) bits.push(b.agents);
+  if (typeof b.tests === "number") bits.push(b.tests + " tests");
+  if (b.firstPassGreen) bits.push("first-pass green: " + b.firstPassGreen);
+  return bits;
+}
 ---
 
 <BaseLayout
@@ -15,10 +38,7 @@ const projectsJson = JSON.stringify(projects);
   description="A growing wall of builds — each one documenting how it was made, which agents and models built it, and what it cost."
   bodyClass="page-scroll"
 >
-  {/* F11: Projects wall. Entries are data in content/projects/projects.json,
-      inlined below and rendered to cards by initProjects() — no fetch. */}
-  <script type="application/json" id="projects-data" set:html={projectsJson}></script>
-
+  {/* F17: Projects wall, rendered at build time from the projects collection. */}
   <main class="projects">
     <p class="colophon-back"><a href="/">&larr; Luke Hornof</a></p>
 
@@ -29,96 +49,35 @@ const projectsJson = JSON.stringify(projects);
       half the story.
     </p>
 
-    <div class="projects-list" id="projects-list"></div>
+    <div class="projects-list" id="projects-list">
+      {
+        projects.map((entry) => {
+          const d = entry.data;
+          const b = d.build || {};
+          const bits = buildBits(b);
+          return (
+            <article class="project-card" data-slug={d.slug}>
+              <div class="project-head">
+                <h2 class="project-title">{d.title}</h2>
+                {d.date && <span class="project-date">{d.date}</span>}
+              </div>
+              {d.blurb && <p class="project-blurb">{d.blurb}</p>}
+              {b.stack && (
+                <p class="project-build">
+                  <span class="project-build-label">Built with </span>{bits.join(" · ")}{b.costNote && <span class="project-cost">{b.costNote}</span>}
+                </p>
+              )}
+              {d.links.length > 0 && (
+                <nav class="project-links" aria-label={`${d.title} links`}>
+                  {d.links.map((l) => (
+                    <a href={l.href} data-astro-reload={isPassthrough(l.href) ? "" : undefined}>{l.label}</a>
+                  ))}
+                </nav>
+              )}
+            </article>
+          );
+        })
+      }
+    </div>
   </main>
-
-  <script>
-    // F11: Projects wall. Entries are inlined JSON (#projects-data); render each
-    // to a card. No fetch — the data is already in the DOM, so this is a pure
-    // static page with zero runtime request.
-    function initProjects() {
-      const list = document.getElementById("projects-list");
-      const dataEl = document.getElementById("projects-data");
-      if (!list || !dataEl) return;
-      // F16: re-render safely if the wall is reached again via a view-transition
-      // swap — start from an empty list so cards never double up.
-      list.innerHTML = "";
-
-      let entries;
-      try {
-        entries = JSON.parse(dataEl.textContent || "[]");
-      } catch (e) {
-        return; // malformed data — leave the wall empty rather than throw
-      }
-      if (!Array.isArray(entries)) return;
-
-      entries.forEach(function (entry) {
-        list.appendChild(buildCard(entry));
-      });
-    }
-
-    function buildCard(entry) {
-      const card = el("article", "project-card");
-      card.setAttribute("data-slug", entry.slug || "");
-
-      const head = el("div", "project-head");
-      head.appendChild(el("h2", "project-title", entry.title));
-      if (entry.date) head.appendChild(el("span", "project-date", entry.date));
-      card.appendChild(head);
-
-      if (entry.blurb) card.appendChild(el("p", "project-blurb", entry.blurb));
-
-      // "How it was built" line — the differentiator, shown not hidden.
-      const b = entry.build || {};
-      if (b.stack) {
-        const bits = [b.stack];
-        if (b.agents) bits.push(b.agents);
-        if (typeof b.tests === "number") bits.push(b.tests + " tests");
-        if (b.firstPassGreen) bits.push("first-pass green: " + b.firstPassGreen);
-        const buildLine = el("p", "project-build");
-        buildLine.appendChild(el("span", "project-build-label", "Built with "));
-        buildLine.appendChild(document.createTextNode(bits.join(" · ")));
-        if (b.costNote) {
-          buildLine.appendChild(el("span", "project-cost", b.costNote));
-        }
-        card.appendChild(buildLine);
-      }
-
-      const links = entry.links || [];
-      if (links.length) {
-        const nav = el("nav", "project-links");
-        nav.setAttribute("aria-label", (entry.title || "project") + " links");
-        links.forEach(function (l) {
-          if (!l || !l.href) return;
-          const a = el("a", null, l.label || l.href);
-          a.setAttribute("href", l.href);
-          // F16: the eclipse app + archives are static passthrough (not Astro
-          // pages); opt their links out of the SPA swap so they load fully.
-          if (/(^|\/)\.20\d\d\//.test(l.href) || /projects\/eclipse\//.test(l.href)) {
-            a.setAttribute("data-astro-reload", "");
-          }
-          nav.appendChild(a);
-        });
-        card.appendChild(nav);
-      }
-      return card;
-    }
-
-    // Tiny DOM helper: element with optional class + text (text set safely).
-    function el(tag, className, text) {
-      const node = document.createElement(tag);
-      if (className) node.className = className;
-      if (text != null) node.textContent = text;
-      return node;
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initProjects);
-    } else {
-      initProjects();
-    }
-    // F16: render again if the wall is reached via a view-transition swap (Astro
-    // fires astro:after-swap on the fresh DOM; module scripts don't re-execute).
-    document.addEventListener("astro:after-swap", initProjects);
-  </script>
 </BaseLayout>
