@@ -65,42 +65,56 @@ body {
 }
 
 /* Original DALL-E panorama, brought back as a fixed textured backdrop with the
-   old slow zoom; a palette scrim over it keeps the text legible. */
-body::before {
-    content: "";
+   old slow zoom; a palette scrim over it keeps the text legible.
+
+   F16: these were `body::before` / `body::after` pseudo-elements. They're now
+   real elements (#bg-panorama, #bg-scrim, injected first in <body> by
+   BaseLayout) so BaseLayout can mark them `transition:persist` — the breathing
+   zoom keeps its animation phase across view-transition navigations instead of
+   restarting, and holding both background layers out of the transition snapshot
+   leaves only the frosted panes to cross-fade. Same visual result as the old
+   pseudo-elements (fixed, full-bleed, behind the content). */
+#bg-panorama {
     position: fixed;
     inset: 0;
     z-index: -2;
+    pointer-events: none;
     background: url("work/img/bg-panorama.webp") center center / cover no-repeat;
     filter: brightness(1.06) saturate(1.03); /* lift the panorama a touch */
-    animation: zoomBackground 24s ease-in-out infinite alternate;
+    /* F16: the breathing zoom is now driven by the Web Animations API (see
+       BaseLayout), NOT a CSS `animation`. transition:persist keeps this node
+       across a view-transition swap, but re-inserting a node RESTARTS its CSS
+       animations — so a CSS animation would reset its phase on every navigation
+       (the exact background-restart this phase fixes). A WAAPI animation lets the
+       script capture currentTime before the swap and resume it after, so the zoom
+       stays continuous. Reduced motion is honored in JS (the animation isn't
+       started), matching the global `* { animation: none }` guard below. */
+    transform: scale(1);
 }
 
 /* Dark mode dims the panorama (brightness down) rather than washing it, so the
    machinery recedes into the dark ground instead of picking up a brown cast. */
-[data-theme="dark"] body::before {
+[data-theme="dark"] #bg-panorama {
     filter: brightness(0.75) saturate(1.03);
 }
 
-body::after {
-    content: "";
+#bg-scrim {
     position: fixed;
     inset: 0;
     z-index: -1;
+    pointer-events: none;
     background: var(--scrim);
 }
 
 /* Smaller panorama on small screens — keeps the mobile Lighthouse budget. */
 @media (max-width: 880px) {
-    body::before {
+    #bg-panorama {
         background-image: url("work/img/bg-panorama-sm.webp");
     }
 }
 
-@keyframes zoomBackground {
-    from { transform: scale(1); }
-    to   { transform: scale(1.08); }
-}
+/* (The old @keyframes zoomBackground was retired in F16 — the zoom is now a
+   WAAPI animation started in BaseLayout so its phase survives navigations.) */
 
 /* ---- Layout: fixed left sidebar + scrolling content (F5) ---- */
 .layout {
@@ -917,5 +931,14 @@ p.colophon-back a:focus-visible {
     * {
         animation: none !important;
         transition: none !important;
+    }
+    /* F16: the `*` rule above can't reach the view-transition pseudo-elements,
+       so zero their animations explicitly — navigation still swaps via the
+       ClientRouter, but instantly (no cross-fade / no snapshot animation). */
+    ::view-transition-group(*),
+    ::view-transition-image-pair(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
     }
 }

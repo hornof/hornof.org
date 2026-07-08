@@ -40,6 +40,9 @@ const projectsJson = JSON.stringify(projects);
       const list = document.getElementById("projects-list");
       const dataEl = document.getElementById("projects-data");
       if (!list || !dataEl) return;
+      // F16: re-render safely if the wall is reached again via a view-transition
+      // swap — start from an empty list so cards never double up.
+      list.innerHTML = "";
 
       let entries;
       try {
@@ -89,6 +92,11 @@ const projectsJson = JSON.stringify(projects);
           if (!l || !l.href) return;
           const a = el("a", null, l.label || l.href);
           a.setAttribute("href", l.href);
+          // F16: the eclipse app + archives are static passthrough (not Astro
+          // pages); opt their links out of the SPA swap so they load fully.
+          if (/(^|\/)\.20\d\d\//.test(l.href) || /projects\/eclipse\//.test(l.href)) {
+            a.setAttribute("data-astro-reload", "");
+          }
           nav.appendChild(a);
         });
         card.appendChild(nav);
@@ -109,5 +117,8 @@ const projectsJson = JSON.stringify(projects);
     } else {
       initProjects();
     }
+    // F16: render again if the wall is reached via a view-transition swap (Astro
+    // fires astro:after-swap on the fresh DOM; module scripts don't re-execute).
+    document.addEventListener("astro:after-swap", initProjects);
   </script>
 </BaseLayout>

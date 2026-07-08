@@ -7,6 +7,8 @@
 // style.css ships from public/ and is linked verbatim (not bundled) so the
 // href stays exactly `style.css` — the one-file skin rule, and what the suite
 // asserts on the projects + built-with pages.
+import { ClientRouter } from "astro:transitions";
+
 export interface Props {
   title: string;
   description?: string;
@@ -38,6 +40,12 @@ const asset = (p: string) => `${assetBase}${p}`;
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href={asset("work/img/LH-icon.ico")} type="image/x-icon" />
     <link rel="stylesheet" href={asset("style.css")} />
+    {/* F16: cross-document view transitions. Internal Astro pages swap in place
+        (SPA-style) so the persisted panorama below keeps breathing across
+        navigations; passthrough links (archives, the eclipse app) opt back out
+        with data-astro-reload. Under prefers-reduced-motion the swap is instant
+        (global.css zeroes the view-transition animations). */}
+    <ClientRouter />
     {/* F7: resolve theme before first paint (no flash of the wrong palette). */}
     <script is:inline>
       (function () {
@@ -57,17 +65,95 @@ const asset = (p: string) => `${assetBase}${p}`;
     </script>
   </head>
   <body class={bodyClass}>
-    {/* F7: dark/light theme toggle. JS sets its label + aria-pressed on load. */}
+    {/* F16: the panorama + palette scrim as real, persisted elements. Marking
+        them transition:persist carries the live DOM node across a view-transition
+        navigation, so the breathing zoom keeps its animation phase (no restart)
+        and both layers stay out of the transition snapshot — leaving only the
+        frosted panes to cross-fade. Styling lives in style.css (#bg-panorama /
+        #bg-scrim); they were body::before / body::after before this phase. */}
+    <div id="bg-panorama" transition:persist aria-hidden="true"></div>
+    <div id="bg-scrim" transition:persist aria-hidden="true"></div>
+
+    {/* F7: dark/light theme toggle. JS sets its label + aria-pressed on load.
+        F16: persisted so its wired listener + state survive navigations. */}
     <button
       type="button"
       class="theme-toggle"
       aria-pressed="false"
       aria-label="Switch color theme"
+      transition:persist
     >
       <span class="theme-toggle-icon" aria-hidden="true"></span>
     </button>
 
     <slot />
+
+    <script>
+      // F16: the panorama's breathing zoom, driven by the Web Animations API so
+      // its phase survives view-transition navigations. The element is
+      // transition:persist (same node carries across the swap) and held out of the
+      // transition snapshot, but re-inserting a node restarts any CSS animation —
+      // so the zoom is a WAAPI animation whose currentTime we capture just before
+      // the DOM swaps and resume on the swapped-in node, keeping it continuous.
+      // Reduced motion → the animation is never started (mirrors the CSS guard).
+      (function () {
+        const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const DURATION = 24000; // ms — matches the original 24s CSS zoom
+        let panoAnim = null;
+        let panoTime = 0; // phase (currentTime) carried across a swap
+
+        function startPanorama(resumeAt) {
+          if (REDUCE.matches) return; // reduced motion: no breathing
+          const el = document.getElementById("bg-panorama");
+          if (!el || typeof el.animate !== "function") return;
+          // Clear anything left on the node (e.g. an animation the swap's
+          // re-insertion may have stranded) so we never stack duplicates.
+          el.getAnimations().forEach(function (a) {
+            a.cancel();
+          });
+          panoAnim = el.animate(
+            [{ transform: "scale(1)" }, { transform: "scale(1.08)" }],
+            {
+              duration: DURATION,
+              iterations: Infinity,
+              direction: "alternate",
+              easing: "ease-in-out",
+            }
+          );
+          if (typeof resumeAt === "number" && resumeAt > 0) {
+            try {
+              panoAnim.currentTime = resumeAt; // pick up the pre-swap phase
+            } catch (e) {
+              /* older engines: fall back to starting from 0 */
+            }
+          }
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function () {
+            startPanorama();
+          });
+        } else {
+          startPanorama();
+        }
+
+        // Capture the phase before the DOM swaps; resume it on the new frame.
+        // astro:after-swap runs before the browser paints, so the resume lands
+        // without a visible jump.
+        document.addEventListener("astro:before-swap", function () {
+          if (panoAnim) {
+            try {
+              panoTime = Number(panoAnim.currentTime) || 0;
+            } catch (e) {
+              panoTime = 0;
+            }
+          }
+        });
+        document.addEventListener("astro:after-swap", function () {
+          startPanorama(panoTime);
+        });
+      })();
+    </script>
 
     <script>
       // F7: dark/light toggle. The head script already resolved data-theme before
@@ -110,6 +196,28 @@ const asset = (p: string) => `${assetBase}${p}`;
       } else {
         initTheme();
       }
+
+      // F16: under the ClientRouter the <head> inline resolver only runs on the
+      // first, full page load; a view-transition swap replaces the <html>
+      // attributes, dropping data-theme and flashing the default palette. Re-apply
+      // it in astro:after-swap, which fires after the DOM swap but *before* the
+      // browser paints the new page — so there's no flash. The theme-toggle button
+      // is transition:persist, so its click wiring carries over untouched; this
+      // only restores the palette attribute the swap cleared.
+      document.addEventListener("astro:after-swap", function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var theme =
+            stored === "light" || stored === "dark"
+              ? stored
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      });
     </script>
   </body>
 </html>

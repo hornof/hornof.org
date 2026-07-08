@@ -16,7 +16,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <h1>How eclipse-sim was built</h1>
 
     <p>
-      <a href="projects/eclipse/">eclipse-sim</a> is a solar-system orrery that runs
+      {/* F16: passthrough app, not an Astro page — full reload, no SPA swap. */}
+      <a href="projects/eclipse/" data-astro-reload>eclipse-sim</a> is a solar-system orrery that runs
       on Newton's laws instead of a lookup table. It places the Sun, eight planets,
       and the Moon from their positions on 1&nbsp;January&nbsp;2000, integrates gravity
       forward one small step at a time, and from that single model predicts real
@@ -105,7 +106,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       Everything above is checkable: <a href="https://github.com/hornof/eclipse-sim"
         >the repo</a
       > holds the brief, the build log, the lessons writeup, and every test. The <a
-        href="projects/eclipse/">simulator itself</a
+        href="projects/eclipse/" data-astro-reload>simulator itself</a
       > runs right here on this site.
     </p>
   </main>

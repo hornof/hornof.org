@@ -17,14 +17,21 @@ test.describe("F11: reachable from the site", () => {
     await expect(page.locator("section#projects")).toHaveCount(1);
 
     // The section carries the outbound link to the full wall — and it resolves live.
+    // F16: internal navigation is now a same-document view-transition swap (the
+    // ClientRouter intercepts the click), not a fresh document GET — so there is
+    // no navigation response to read a 200 off. Assert the stronger end-to-end
+    // fact instead: the click lands on the wall URL and the wall actually renders
+    // its cards there (proving the swap + the after-swap re-init both work). The
+    // 200/real-content contract for the wall itself is covered by the direct
+    // page.goto("/projects.html") tests below and by the passthrough suite; that
+    // a real view transition fires here is covered by transitions.spec.js.
     const wallLink = page.locator('#projects a[href="projects.html"]');
     await expect(wallLink).toHaveCount(1);
-    const resp = await Promise.all([
-      page.waitForNavigation(),
-      wallLink.click(),
-    ]).then(([nav]) => nav);
-    expect(resp && resp.status(), "projects page status").toBe(200);
+    await wallLink.click();
+    await page.waitForURL(/projects/);
     await expect(page).toHaveURL(/projects/);
+    await expect(page.locator("h1")).toHaveText(/projects/i);
+    await expect(page.locator(".project-card").first()).toBeVisible();
   });
 });
 

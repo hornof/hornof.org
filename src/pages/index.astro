@@ -273,79 +273,106 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </svg>
     </button>
     <ul id="tardis-panel" class="tardis-panel" hidden>
-      <li><a href="/.2013/">2013</a></li>
-      <li><a href="/.2025/">2025</a></li>
+      {/* F16: data-astro-reload — the archives are static passthrough docs, not
+          Astro pages, so opt out of the SPA swap and do a real navigation. */}
+      <li><a href="/.2013/" data-astro-reload>2013</a></li>
+      <li><a href="/.2025/" data-astro-reload>2025</a></li>
     </ul>
   </div>
 
   <script>
     // The three interactive home-page behaviors, ported from main.js:
     // the Tardis time-machine, the Breton egg, and the scroll-spy nav.
+    //
+    // F16: under the ClientRouter these run once on first load AND must re-run
+    // after every view-transition swap (Astro doesn't re-execute module scripts;
+    // it fires astro:after-swap on the fresh DOM instead). Each disclosure keeps
+    // its document-level listeners in a module slot and removes the previous pair
+    // before re-binding, so navigating away and back never stacks duplicate
+    // handlers or leaves them pointing at detached nodes.
 
     // F4: Tardis time-machine — a subtle control revealing links to the archives.
+    let tardisKeydown: ((e: KeyboardEvent) => void) | null = null;
+    let tardisDocClick: ((e: MouseEvent) => void) | null = null;
     function initTardis() {
       const toggle = document.querySelector(".tardis-toggle");
       const panel = document.getElementById("tardis-panel");
       if (!toggle || !panel) return;
 
       function isOpen() {
-        return toggle.getAttribute("aria-expanded") === "true";
+        return toggle!.getAttribute("aria-expanded") === "true";
       }
       function open() {
-        panel.hidden = false;
-        toggle.setAttribute("aria-expanded", "true");
+        panel!.hidden = false;
+        toggle!.setAttribute("aria-expanded", "true");
       }
-      function close(returnFocus) {
-        panel.hidden = true;
-        toggle.setAttribute("aria-expanded", "false");
-        if (returnFocus) toggle.focus();
+      function close(returnFocus: boolean) {
+        panel!.hidden = true;
+        toggle!.setAttribute("aria-expanded", "false");
+        if (returnFocus) (toggle as HTMLElement).focus();
       }
 
       toggle.addEventListener("click", function () {
         if (isOpen()) close(false);
         else open();
       });
-      document.addEventListener("keydown", function (e) {
+      if (tardisKeydown) document.removeEventListener("keydown", tardisKeydown);
+      if (tardisDocClick) document.removeEventListener("click", tardisDocClick);
+      tardisKeydown = function (e) {
         if (e.key === "Escape" && isOpen()) close(true);
-      });
-      document.addEventListener("click", function (e) {
+      };
+      tardisDocClick = function (e) {
         if (isOpen() && !(e.target as Element).closest(".tardis")) close(false);
-      });
+      };
+      document.addEventListener("keydown", tardisKeydown);
+      document.addEventListener("click", tardisDocClick);
     }
 
     // F9: Breton Easter egg — a faint fleur-de-lis revealing a nod to Brittany.
     // Same disclosure pattern as the Tardis (open/close, Escape, outside-click).
+    let bretonKeydown: ((e: KeyboardEvent) => void) | null = null;
+    let bretonDocClick: ((e: MouseEvent) => void) | null = null;
     function initBreton() {
       const toggle = document.querySelector(".breton-toggle");
       const panel = document.getElementById("breton-panel");
       if (!toggle || !panel) return;
 
       function isOpen() {
-        return toggle.getAttribute("aria-expanded") === "true";
+        return toggle!.getAttribute("aria-expanded") === "true";
       }
       function open() {
-        panel.hidden = false;
-        toggle.setAttribute("aria-expanded", "true");
+        panel!.hidden = false;
+        toggle!.setAttribute("aria-expanded", "true");
       }
-      function close(returnFocus) {
-        panel.hidden = true;
-        toggle.setAttribute("aria-expanded", "false");
-        if (returnFocus) toggle.focus();
+      function close(returnFocus: boolean) {
+        panel!.hidden = true;
+        toggle!.setAttribute("aria-expanded", "false");
+        if (returnFocus) (toggle as HTMLElement).focus();
       }
 
       toggle.addEventListener("click", function () {
         if (isOpen()) close(false);
         else open();
       });
-      document.addEventListener("keydown", function (e) {
+      if (bretonKeydown) document.removeEventListener("keydown", bretonKeydown);
+      if (bretonDocClick) document.removeEventListener("click", bretonDocClick);
+      bretonKeydown = function (e) {
         if (e.key === "Escape" && isOpen()) close(true);
-      });
-      document.addEventListener("click", function (e) {
+      };
+      bretonDocClick = function (e) {
         if (isOpen() && !(e.target as Element).closest(".breton")) close(false);
-      });
+      };
+      document.addEventListener("keydown", bretonKeydown);
+      document.addEventListener("click", bretonDocClick);
     }
 
     // F5: scroll-spy — highlight the nav link for the section currently in view.
+    // F16: module slots hold the live observer + scroll target so a re-init tears
+    // the previous ones down before rebuilding against the swapped-in sections.
+    let spyObserver: IntersectionObserver | null = null;
+    let spyScrollTarget: (Element | Window) | null = null;
+    let spyOnScroll: (() => void) | null = null;
+    let spyWindowBound = false;
     function initScrollSpy() {
       // Only in-page anchors take part in scroll-spy; page links (e.g. Projects)
       // are skipped so they never get a scroll-spy target lookup.
@@ -378,18 +405,20 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       const container = scrollContainer();
 
       // A thin band a bit above the middle of the scroll box is the "spy line":
-      // the section crossing it is the active one.
+      // the section crossing it is the active one. F16: disconnect any observer
+      // left over from a prior page so it doesn't keep firing on detached nodes.
+      if (spyObserver) spyObserver.disconnect();
       if ("IntersectionObserver" in window) {
-        const observer = new IntersectionObserver(
+        spyObserver = new IntersectionObserver(
           function (entries) {
             entries.forEach(function (entry) {
-              if (entry.isIntersecting) setActive(entry.target.id);
+              if (entry.isIntersecting) setActive((entry.target as HTMLElement).id);
             });
           },
           { root: container, rootMargin: "-40% 0px -55% 0px", threshold: 0 }
         );
         sections.forEach(function (s) {
-          observer.observe(s);
+          spyObserver!.observe(s as Element);
         });
       }
 
@@ -413,16 +442,34 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         if (atBottom) setActive(last.id);
         else if (atTop) setActive(first.id);
       }
-      (container || window).addEventListener("scroll", edgeGuard, {
-        passive: true,
-      });
+      // F16: drop the previous scroll listener (its target may now be detached)
+      // before binding the current scroll box.
+      if (spyScrollTarget && spyOnScroll) {
+        spyScrollTarget.removeEventListener("scroll", spyOnScroll);
+      }
+      spyScrollTarget = container || window;
+      spyOnScroll = edgeGuard;
+      spyScrollTarget.addEventListener("scroll", spyOnScroll, { passive: true });
       edgeGuard(); // initial state
       // Re-assert once the layout settles and on resize. On mobile the tall sidebar
       // pushes every section below the spy band at the top, so the observer alone
       // (which only sets on intersect, never clears) can leave a stale link lit
-      // until the first scroll. The load/resize passes correct that.
-      window.addEventListener("load", edgeGuard);
-      window.addEventListener("resize", edgeGuard, { passive: true });
+      // until the first scroll. The load/resize passes correct that. edgeGuard
+      // re-reads the scroll box each call, so these window-level listeners are
+      // bound once (F16: guarded) and stay correct across navigations.
+      if (!spyWindowBound) {
+        spyWindowBound = true;
+        window.addEventListener("load", function () {
+          if (spyOnScroll) spyOnScroll();
+        });
+        window.addEventListener(
+          "resize",
+          function () {
+            if (spyOnScroll) spyOnScroll();
+          },
+          { passive: true }
+        );
+      }
     }
 
     // The scrollable ancestor of the sections, or null when the page itself
@@ -446,10 +493,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       initScrollSpy();
     }
 
+    // First, full page load (module scripts are deferred, so the DOM is ready).
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", init);
     } else {
       init();
     }
+    // F16: re-init after a view-transition swap brings the home page back. Astro
+    // fires astro:after-swap only on SPA swaps (never on the first load), so this
+    // rebuilds against the fresh DOM without double-binding on the initial load.
+    // The teardown inside each init keeps document/scroll listeners from stacking.
+    document.addEventListener("astro:after-swap", init);
   </script>
 </BaseLayout>
