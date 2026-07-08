@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="How eclipse-sim was built — Luke Hornof"
+  description="How a one-page brief became a working eclipse predictor overnight — and what the debugging afterward taught about testing agent-built software."
+  bodyClass="page-fixed"
+>
+  {/* Provenance page for the eclipse-sim project. Sources: the repo's
+      ROADMAP.md (the brief), LOG.md (iterations), WALL.md (numbers),
+      LESSONS.md (the debugging story). */}
+  <main class="colophon">
+    <p class="colophon-back"><a href="projects.html">&larr; Projects</a></p>
+
+    <h1>How eclipse-sim was built</h1>
+
+    <p>
+      <a href="projects/eclipse/">eclipse-sim</a> is a solar-system orrery that runs
+      on Newton's laws instead of a lookup table. It places the Sun, eight planets,
+      and the Moon from their positions on 1&nbsp;January&nbsp;2000, integrates gravity
+      forward one small step at a time, and from that single model predicts real
+      solar and lunar eclipses. Next to every prediction sits a &ldquo;&Delta; vs
+      catalog&rdquo; column showing how far it lands from NASA's published time. The
+      miss margin never hides &mdash; a prediction you can't check isn't worth much.
+    </p>
+
+    <h2>One document in, a project out</h2>
+
+    <p>
+      The entire input was a one-page brief: six features, numeric tolerances
+      written down in advance (&ldquo;energy drift &lt;&nbsp;1e-6 over a
+      century&rdquo;, &ldquo;every eclipse within &plusmn;6 hours of the
+      catalog&rdquo;), and ground rules &mdash; physics from first principles, no
+      ephemeris API at runtime, NASA data allowed only as test fixtures to score
+      against, tests landing with every feature, one branch and PR per feature, an
+      append-only build log, hard stop conditions. The brief was committed at 23:25
+      and an agent (Claude&nbsp;Opus&nbsp;4.8) worked it unattended overnight. By
+      00:12 &mdash; 47 minutes later &mdash; the integrator, the 3-D orrery,
+      solar-eclipse detection, and the verification panel were all committed with
+      green tests. The lunar-eclipse and saros stretch goal followed by 00:26.
+    </p>
+
+    <p>
+      The receipts are public: the brief (<code>ROADMAP.md</code>), the
+      one-line-per-iteration <code>LOG.md</code>, and the git timestamps. Nineteen
+      logged iterations total, no human edits to the code.
+    </p>
+
+    <h2>The part worth reading: what the debugging taught</h2>
+
+    <p>
+      The overnight suite was green &mdash; and wrong in four places. All four bugs
+      were found the next day by a human scrubbing the timeline by hand, and all
+      four lived in the same spot: not the numeric core, but the stateful plumbing
+      behind the &ldquo;next eclipse&rdquo; card (an async, debounced, cached
+      search). Dragging the slider queued thirty seconds of searches. Scrubbing
+      before 2020 skipped two decades. Scrubbing backward served a stale answer.
+      Playing past an eclipse froze the card &mdash; the debounce that fixed the
+      drag bug starved under continuous play.
+    </p>
+
+    <p>
+      Why did a hundred green tests miss them? Every test fired single actions,
+      forward in time, at happy-middle dates. One test literally asserted the buggy
+      output &mdash; a hand-picked expected value written from the same wrong mental
+      model as the code. Coverage looked fine, because coverage measures whether a
+      line ran, not whether any assertion would catch it lying.
+    </p>
+
+    <p>
+      The fixes changed the testing, not just the code. The cache decision was
+      extracted into a pure module and put under property-based tests: 6,000+ random
+      slider walks &mdash; forward, backward, jumps &mdash; checked against an
+      independent oracle after every move, plus a meta-test that re-introduces the
+      real bug and proves the harness catches it. Mutation testing was wired in to
+      measure what coverage can't: the score on the card logic went from 71% to 94%,
+      and the mutants found two real boundary gaps before any human did. The full
+      story is in <code>LESSONS.md</code> in the repo.
+    </p>
+
+    <h2>The numbers (all reproducible)</h2>
+
+    <p>
+      Run <code>npm test</code> and <code>npm run test:e2e</code> to regenerate these.
+      Energy drift over a simulated century: 6.1e-11 against a 1e-6 requirement.
+      Planet positions within 0.15&deg; of JPL at five epochs. All 16 solar eclipses
+      2020&ndash;2030 detected, worst timing error 18&nbsp;minutes against a
+      &plusmn;6-hour tolerance; all 22 lunar eclipses, types exact; zero false
+      positives; 3 of 3 saros series derived and matched. 64 unit tests, 71 browser
+      tests, mutation score 94% on the card logic.
+    </p>
+
+    <p>
+      One honest limitation, stated on the page itself: it's a point-mass Newtonian
+      model. It nails eclipse <em>timing</em> but is approximate about <em>place</em>
+      &mdash; Earth turns 15&deg; an hour, so a ~18-minute timing error smears the
+      ground point east&ndash;west by a few hundred kilometres. The one
+      classification it can't resolve is a knife-edge 2023 hybrid whose annular tips
+      are finer than the model can see. It says so rather than special-casing it to
+      look correct.
+    </p>
+
+    <p class="colophon-repo">
+      Everything above is checkable: <a href="https://github.com/hornof/eclipse-sim"
+        >the repo</a
+      > holds the brief, the build log, the lessons writeup, and every test. The <a
+        href="projects/eclipse/">simulator itself</a
+      > runs right here on this site.
+    </p>
+  </main>
+</BaseLayout>

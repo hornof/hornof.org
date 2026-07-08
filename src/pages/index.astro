@@ -1,16 +1,455 @@
 ---
-// PR 0 placeholder — a shell so `astro build` runs. PR 1 (parity port) replaces
-// this with the real BaseLayout + ported home page.
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hornof.org — Astro scaffold</title>
-  </head>
-  <body>
-    <p>Astro scaffold — parity port lands in PR 1.</p>
-  </body>
-</html>
+<BaseLayout
+  title="Luke Hornof"
+  description="Luke Hornof — AI Engineering & Leadership. Founder, researcher, and software engineer."
+>
+  <div class="layout">
+    <header class="sidebar">
+      <div class="intro">
+        <h1 class="name">Luke Hornof</h1>
+        <p class="tagline">AI Engineering Leader</p>
+        <p class="positioning">Founder, researcher, agentic engineer.</p>
+        <p class="positioning">
+          Vision: amazing teams, successful products, happy customers.
+        </p>
+      </div>
+
+      <nav class="section-nav" aria-label="Sections">
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#publications">Publications</a>
+        <a href="#talks">Talks</a>
+        <a href="#projects">Projects</a>
+      </nav>
+
+      <nav class="social" aria-label="Social profiles">
+        <a href="https://www.linkedin.com/in/lukehornof" aria-label="LinkedIn">
+          <img src="work/img/linkedin-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a
+          href="https://scholar.google.com/citations?user=Al_FuxQAAAAJ"
+          aria-label="Google Scholar"
+        >
+          <img src="work/img/google-scholar-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://x.com/hornof/" aria-label="X">
+          <img src="work/img/x-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://github.com/hornof/" aria-label="GitHub">
+          <img src="work/img/github-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://facebook.com/lukehornof/" aria-label="Facebook">
+          <img src="work/img/facebook-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://instagram.com/lukehornof/" aria-label="Instagram">
+          <img src="work/img/instagram-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+        <a href="https://soundcloud.com/luke-hornof" aria-label="SoundCloud">
+          <img src="work/img/soundcloud-icon-brown.png" alt="" width="24" height="24" />
+        </a>
+      </nav>
+    </header>
+
+    {/* Section copy is the source in content/*.md, inlined here by hand. */}
+    <main class="content">
+      <section id="about">
+        <h2>About</h2>
+        <p>
+          AI is changing how engineering teams are built and run, and the
+          companies that adapt fastest will pull ahead. The best engineering
+          leaders will combine traditional management with their own hands-on
+          agentic engineering.
+        </p>
+        <p>
+          I've built and managed engineering organizations for over a decade —
+          finding great engineers, creating a culture where they do their best
+          work, and scaling teams that consistently ship.
+        </p>
+        <p>
+          At Nervana, I founded the software team from scratch and grew it to 10
+          engineers. After the Intel acquisition, I scaled the team to 150
+          across the US, Poland, India, and Israel — without losing the quality
+          and culture that made us worth acquiring. As co-founder of Luminide, I
+          led product, engineering, and go-to-market — through acquisition by
+          Akridata. Most recently, as CTO at ThirdLaw, I built runtime safety
+          and observability for LLM and agent behavior.
+        </p>
+        <p>
+          Underneath it all: 20+ years of hands-on engineering and research, a
+          Ph.D. in CS, and published work at NeurIPS. I know how engineers think
+          because I am one — these days, an agentic one.
+        </p>
+      </section>
+
+      <section id="experience">
+        <h2>Experience</h2>
+        <ul class="cv">
+          <li>
+            <span class="cv-role">CTO, ThirdLaw</span>
+            <span class="cv-when">2025–2026</span><span class="cv-what"
+              >Runtime AI safety: observability and governance for LLM and agent
+              behavior in the enterprise.</span
+            >
+          </li>
+          <li>
+            <span class="cv-role">VP of Engineering, TensorWave</span>
+            <span class="cv-when">2024</span><span class="cv-what"
+              >Engineering, recruiting, and datacenter/SaaS operations.</span
+            >
+          </li>
+          <li>
+            <span class="cv-role">AI Engineering &amp; Leadership, consulting</span>
+            <span class="cv-when">2023–2025</span><span class="cv-what"
+              >Advised companies and investors; engagements including DE Shaw and
+              GLG.</span
+            >
+          </li>
+          <li>
+            <span class="cv-role">Senior Director, Product, Akridata</span>
+            <span class="cv-when">2022–2023</span><span class="cv-what"
+              >Integrated Luminide's IDE; led GTM and community (Kaggle, ML
+              Commons).</span
+            >
+          </li>
+          <li>
+            <span class="cv-role">Co-founder &amp; CEO, Luminide</span>
+            <span class="cv-when">2020–2022</span><span class="cv-what"
+              >AI tools for model accuracy and lower training cost; acquired by
+              Akridata.</span
+            >
+          </li>
+          <li>
+            <span class="cv-role">Director of AI Software, Intel</span>
+            <span class="cv-when">2016–2019</span><span class="cv-what"
+              >Grew the team from 10 to 150 across four countries; three AI chip
+              bring-ups; co-developed Flexpoint.</span
+            >
+          </li>
+          <li>
+            <span class="cv-role">Director of AI Software, Nervana</span>
+            <span class="cv-when">2014–2016</span><span class="cv-what"
+              >Founded the software team for the first AI hardware accelerator;
+              acquired by Intel.</span
+            >
+          </li>
+        </ul>
+      </section>
+
+      <section id="publications">
+        <h2>Publications &amp; Patents</h2>
+        <ul class="pubs">
+          <li>
+            <a href="https://arxiv.org/abs/1711.02213"
+              >Flexpoint: An Adaptive Numerical Format for Efficient Training of
+              Deep Neural Networks</a
+            > — NeurIPS, 2017.
+          </li>
+          <li>
+            <a href="https://patents.google.com/patent/US10552119B2/en"
+              >Dynamic Management of Numerical Representation in a Distributed
+              Matrix Processor Architecture</a
+            > — U.S. Patent 10,552,119.
+          </li>
+          <li>
+            <a href="https://patents.google.com/patent/US20230196108A1/en"
+              >Expedited Assessment and Ranking of Model Quality in Machine
+              Learning</a
+            > — U.S. Patent Application 17/560,422.
+          </li>
+          <li>
+            <a
+              href="https://www.wiley.com/en-us/Real+Time+Analytics%3A+Techniques+to+Analyze+and+Visualize+Streaming+Data-p-9781118837917"
+              >Real-time Analytics: Techniques to Analyze and Visualize Streaming
+              Data</a
+            > — Byron Ellis, edited by Luke Hornof. Wiley, 2014.
+          </li>
+          <li>
+            <a href="https://doi.org/10.1017/S0956796802004598"
+              >Compiling for Template-based Run-time Code Generation</a
+            > — Journal of Functional Programming 13(3), 2003.
+          </li>
+        </ul>
+        <p class="more">
+          <a href="https://scholar.google.com/citations?user=Al_FuxQAAAAJ"
+            >Complete list on Google Scholar &rarr;</a
+          >
+        </p>
+      </section>
+
+      <section id="talks">
+        <h2>Talks</h2>
+        <p>
+          Speaking on engineering leadership and building in the AI era, at SF AI
+          meetups and founder events. Recent topics:
+        </p>
+        <ul class="talks">
+          <li>Building Amazing Engineering Teams</li>
+          <li>Bootstrapping a Startup — the Luminide story</li>
+          <li>Company Models — the AI OS for Companies</li>
+          <li>The Times They Are AI-Changin'</li>
+        </ul>
+      </section>
+
+      <section id="projects">
+        <h2>Projects</h2>
+        <p>
+          A growing wall of builds — each one documenting how it was made: the
+          stack, the agents and models, the tests, the cost. This site is the
+          first entry; eclipse-sim, a from-scratch eclipse predictor built
+          overnight, is the second.
+        </p>
+        <p class="more"><a href="projects.html">See all projects &rarr;</a></p>
+      </section>
+
+      {/* F9: Breton Easter egg — a quiet sign-off dropped into the trailing
+          space below the last section. A faint fleur-de-lis; click reveals a nod
+          to Brittany, France, where Luke earned his PhD. Same subtle register as
+          the Tardis. */}
+      <footer class="page-sign-off">
+        <span class="breton">
+          <button
+            type="button"
+            class="breton-toggle"
+            aria-expanded="false"
+            aria-controls="breton-panel"
+            aria-label="A small nod to Brittany, France"
+          >
+            <span aria-hidden="true">&#9884;</span>
+          </button>
+          <span id="breton-panel" class="breton-panel" hidden>
+            <span
+              class="gwenn-ha-du"
+              role="img"
+              aria-label="Gwenn ha Du, the flag of Brittany"></span>
+            <span class="breton-text" lang="br"
+              >Breizh atav — <span lang="en">a corner of Brittany, France.</span
+              ></span
+            >
+          </span>
+        </span>
+      </footer>
+    </main>
+  </div>
+
+  {/* Tardis time-machine: a subtle Easter-egg control linking the archives. */}
+  <div class="tardis">
+    <button
+      type="button"
+      class="tardis-toggle"
+      aria-expanded="false"
+      aria-controls="tardis-panel"
+      aria-label="Time machine — browse earlier versions of this site"
+    >
+      <span class="tardis-label" aria-hidden="true">Click to time travel!</span>
+      {/* Tardis (Doctor Who police box), original SVG — homage to the spinning
+          Tardis on brittanychiang.com's archive control. */}
+      <svg
+        class="tardis-svg"
+        viewBox="0 0 44 64"
+        width="40"
+        height="58"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect class="td-lamp" x="20" y="2" width="4" height="4" rx="1"></rect>
+        <rect class="td-dark" x="21" y="5" width="2" height="3"></rect>
+        <rect class="td-roof" x="9" y="6" width="26" height="3" rx="1"></rect>
+        <rect class="td-dark" x="6" y="8" width="32" height="6" rx="1"></rect>
+        <rect class="td-body" x="8" y="14" width="28" height="47"></rect>
+        <rect class="td-dark" x="8" y="14" width="28" height="5"></rect>
+        <rect class="td-window" x="11" y="22" width="9" height="9"></rect>
+        <rect class="td-window" x="24" y="22" width="9" height="9"></rect>
+        <line class="td-line" x1="15.5" y1="22" x2="15.5" y2="31"></line>
+        <line class="td-line" x1="28.5" y1="22" x2="28.5" y2="31"></line>
+        <line class="td-line" x1="11" y1="26.5" x2="20" y2="26.5"></line>
+        <line class="td-line" x1="24" y1="26.5" x2="33" y2="26.5"></line>
+        <line class="td-line td-door" x1="22" y1="19" x2="22" y2="61"></line>
+        <rect class="td-panel" x="11" y="35" width="9" height="22"></rect>
+        <rect class="td-panel" x="24" y="35" width="9" height="22"></rect>
+        <rect class="td-dark" x="6" y="60" width="32" height="3" rx="1"></rect>
+      </svg>
+    </button>
+    <ul id="tardis-panel" class="tardis-panel" hidden>
+      <li><a href="/.2013/">2013</a></li>
+      <li><a href="/.2025/">2025</a></li>
+    </ul>
+  </div>
+
+  <script>
+    // The three interactive home-page behaviors, ported from main.js:
+    // the Tardis time-machine, the Breton egg, and the scroll-spy nav.
+
+    // F4: Tardis time-machine — a subtle control revealing links to the archives.
+    function initTardis() {
+      const toggle = document.querySelector(".tardis-toggle");
+      const panel = document.getElementById("tardis-panel");
+      if (!toggle || !panel) return;
+
+      function isOpen() {
+        return toggle.getAttribute("aria-expanded") === "true";
+      }
+      function open() {
+        panel.hidden = false;
+        toggle.setAttribute("aria-expanded", "true");
+      }
+      function close(returnFocus) {
+        panel.hidden = true;
+        toggle.setAttribute("aria-expanded", "false");
+        if (returnFocus) toggle.focus();
+      }
+
+      toggle.addEventListener("click", function () {
+        if (isOpen()) close(false);
+        else open();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isOpen()) close(true);
+      });
+      document.addEventListener("click", function (e) {
+        if (isOpen() && !(e.target as Element).closest(".tardis")) close(false);
+      });
+    }
+
+    // F9: Breton Easter egg — a faint fleur-de-lis revealing a nod to Brittany.
+    // Same disclosure pattern as the Tardis (open/close, Escape, outside-click).
+    function initBreton() {
+      const toggle = document.querySelector(".breton-toggle");
+      const panel = document.getElementById("breton-panel");
+      if (!toggle || !panel) return;
+
+      function isOpen() {
+        return toggle.getAttribute("aria-expanded") === "true";
+      }
+      function open() {
+        panel.hidden = false;
+        toggle.setAttribute("aria-expanded", "true");
+      }
+      function close(returnFocus) {
+        panel.hidden = true;
+        toggle.setAttribute("aria-expanded", "false");
+        if (returnFocus) toggle.focus();
+      }
+
+      toggle.addEventListener("click", function () {
+        if (isOpen()) close(false);
+        else open();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isOpen()) close(true);
+      });
+      document.addEventListener("click", function (e) {
+        if (isOpen() && !(e.target as Element).closest(".breton")) close(false);
+      });
+    }
+
+    // F5: scroll-spy — highlight the nav link for the section currently in view.
+    function initScrollSpy() {
+      // Only in-page anchors take part in scroll-spy; page links (e.g. Projects)
+      // are skipped so they never get a scroll-spy target lookup.
+      const links = Array.prototype.slice
+        .call(document.querySelectorAll(".section-nav a"))
+        .filter(function (a) {
+          const href = a.getAttribute("href");
+          return href && href.charAt(0) === "#";
+        });
+      if (!links.length) return;
+
+      const sections = links
+        .map(function (a) {
+          return document.querySelector(a.getAttribute("href"));
+        })
+        .filter(Boolean);
+      if (!sections.length) return;
+
+      function setActive(id) {
+        links.forEach(function (a) {
+          const on = a.getAttribute("href") === "#" + id;
+          a.classList.toggle("active", on);
+          if (on) a.setAttribute("aria-current", "true");
+          else a.removeAttribute("aria-current");
+        });
+      }
+
+      // On desktop the content panel scrolls internally (fixed-height frame); on
+      // mobile the page scrolls. Spy against whichever is the real scroll box.
+      const container = scrollContainer();
+
+      // A thin band a bit above the middle of the scroll box is the "spy line":
+      // the section crossing it is the active one.
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) setActive(entry.target.id);
+            });
+          },
+          { root: container, rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      }
+
+      // Guard the extremes so the first/last section win at the very top/bottom,
+      // where the spy line may sit past the edge of the scroll box.
+      const last = sections[sections.length - 1];
+      const first = sections[0];
+      function edgeGuard() {
+        // Recompute the scroll box each call so this stays correct across the
+        // mobile/desktop breakpoint (the page scrolls on mobile, the pane on desktop).
+        const box = scrollContainer();
+        let atBottom, atTop;
+        if (box) {
+          atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
+          atTop = box.scrollTop <= 2;
+        } else {
+          const doc = document.documentElement;
+          atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+          atTop = window.scrollY <= 2;
+        }
+        if (atBottom) setActive(last.id);
+        else if (atTop) setActive(first.id);
+      }
+      (container || window).addEventListener("scroll", edgeGuard, {
+        passive: true,
+      });
+      edgeGuard(); // initial state
+      // Re-assert once the layout settles and on resize. On mobile the tall sidebar
+      // pushes every section below the spy band at the top, so the observer alone
+      // (which only sets on intersect, never clears) can leave a stale link lit
+      // until the first scroll. The load/resize passes correct that.
+      window.addEventListener("load", edgeGuard);
+      window.addEventListener("resize", edgeGuard, { passive: true });
+    }
+
+    // The scrollable ancestor of the sections, or null when the page itself
+    // scrolls (mobile). Desktop gives .content overflow-y:auto + a fixed height.
+    function scrollContainer() {
+      const content = document.querySelector(".content");
+      if (!content) return null;
+      const oy = getComputedStyle(content).overflowY;
+      if (
+        (oy === "auto" || oy === "scroll") &&
+        content.scrollHeight > content.clientHeight + 4
+      ) {
+        return content;
+      }
+      return null;
+    }
+
+    function init() {
+      initTardis();
+      initBreton();
+      initScrollSpy();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  </script>
+</BaseLayout>

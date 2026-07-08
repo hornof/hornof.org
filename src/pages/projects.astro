@@ -1,0 +1,113 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import projects from "../../content/projects/projects.json";
+
+// The wall stays data-driven and client-rendered for parity (F15): the entries
+// are inlined as JSON and turned into cards by initProjects() below — no fetch,
+// so it's still a pure static page with zero runtime request. Content collections
+// + build-time rendering are a later phase (F17). Inlining from the imported JSON
+// also keeps it in lockstep with content/projects/projects.json by construction.
+const projectsJson = JSON.stringify(projects);
+---
+
+<BaseLayout
+  title="Projects — Luke Hornof"
+  description="A growing wall of builds — each one documenting how it was made, which agents and models built it, and what it cost."
+  bodyClass="page-scroll"
+>
+  {/* F11: Projects wall. Entries are data in content/projects/projects.json,
+      inlined below and rendered to cards by initProjects() — no fetch. */}
+  <script type="application/json" id="projects-data" set:html={projectsJson}></script>
+
+  <main class="projects">
+    <p class="colophon-back"><a href="/">&larr; Luke Hornof</a></p>
+
+    <h1>Projects</h1>
+    <p class="projects-intro">
+      A growing wall of builds. Each one records how it was made — the stack, the
+      agents and models, the tests, the cost — because how a thing gets built is
+      half the story.
+    </p>
+
+    <div class="projects-list" id="projects-list"></div>
+  </main>
+
+  <script>
+    // F11: Projects wall. Entries are inlined JSON (#projects-data); render each
+    // to a card. No fetch — the data is already in the DOM, so this is a pure
+    // static page with zero runtime request.
+    function initProjects() {
+      const list = document.getElementById("projects-list");
+      const dataEl = document.getElementById("projects-data");
+      if (!list || !dataEl) return;
+
+      let entries;
+      try {
+        entries = JSON.parse(dataEl.textContent || "[]");
+      } catch (e) {
+        return; // malformed data — leave the wall empty rather than throw
+      }
+      if (!Array.isArray(entries)) return;
+
+      entries.forEach(function (entry) {
+        list.appendChild(buildCard(entry));
+      });
+    }
+
+    function buildCard(entry) {
+      const card = el("article", "project-card");
+      card.setAttribute("data-slug", entry.slug || "");
+
+      const head = el("div", "project-head");
+      head.appendChild(el("h2", "project-title", entry.title));
+      if (entry.date) head.appendChild(el("span", "project-date", entry.date));
+      card.appendChild(head);
+
+      if (entry.blurb) card.appendChild(el("p", "project-blurb", entry.blurb));
+
+      // "How it was built" line — the differentiator, shown not hidden.
+      const b = entry.build || {};
+      if (b.stack) {
+        const bits = [b.stack];
+        if (b.agents) bits.push(b.agents);
+        if (typeof b.tests === "number") bits.push(b.tests + " tests");
+        if (b.firstPassGreen) bits.push("first-pass green: " + b.firstPassGreen);
+        const buildLine = el("p", "project-build");
+        buildLine.appendChild(el("span", "project-build-label", "Built with "));
+        buildLine.appendChild(document.createTextNode(bits.join(" · ")));
+        if (b.costNote) {
+          buildLine.appendChild(el("span", "project-cost", b.costNote));
+        }
+        card.appendChild(buildLine);
+      }
+
+      const links = entry.links || [];
+      if (links.length) {
+        const nav = el("nav", "project-links");
+        nav.setAttribute("aria-label", (entry.title || "project") + " links");
+        links.forEach(function (l) {
+          if (!l || !l.href) return;
+          const a = el("a", null, l.label || l.href);
+          a.setAttribute("href", l.href);
+          nav.appendChild(a);
+        });
+        card.appendChild(nav);
+      }
+      return card;
+    }
+
+    // Tiny DOM helper: element with optional class + text (text set safely).
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initProjects);
+    } else {
+      initProjects();
+    }
+  </script>
+</BaseLayout>
