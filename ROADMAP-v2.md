@@ -38,11 +38,11 @@
 - [x] No Lighthouse regression on the wall page: wall 100 in 3 isolated runs (iframe carries no src until opened). Full suite 116/116 green.
 - [ ] (Luke eclipse-pane feel-check gate — screenshot in LOG confirms desktop controls/help-overlay usable inside the pane.)
 
-## V4 — Tech-debt exploration (report only; branch `v2/v4-techdebt-report` off V3)
-- [ ] Item 1 — dot-dir archives (`/.2013/`, `/.2025/`): rename-to-non-dot plan + permanent redirects + link inventory + SEO/redirect notes → recommendation in LOG-v2.md.
-- [ ] Item 2 — eclipse code copy: ranked options (per-project Pages subdomain / build-time pull / keep snapshot+sync) with costs → recommendation in LOG-v2.md.
-- [ ] Item 3 — PROVENANCE/sync-script freshness given (2) → recommendation in LOG-v2.md.
-- [ ] Three NEEDS-LUKE entries filed in QUESTIONS.md. Zero execution.
+## V4 — Tech-debt exploration (report only; branch `v4/techdebt-report` off V3)
+- [x] Item 1 — dot-dir archives (`/.2013/`, `/.2025/`): rename-to-non-dot plan + 301 redirects + link inventory (2 inbound refs) + SEO/redirect notes → recommendation in LOG-v2.md.
+- [x] Item 2 — eclipse code copy: ranked options (keep snapshot+sync / per-project Pages subdomain / build-time pull) with costs → recommendation in LOG-v2.md.
+- [x] Item 3 — PROVENANCE/sync-script freshness given (2) → recommendation in LOG-v2.md.
+- [x] Three NEEDS-LUKE entries filed in QUESTIONS.md (Q3/Q4/Q5). Zero execution.
 
 ## Halt conditions
 Stop cleanly (write reason in LOG-v2.md) when ANY of:
