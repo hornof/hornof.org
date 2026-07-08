@@ -9,9 +9,10 @@ import MainLayout from "../layouts/MainLayout.astro";
 >
   {/* Provenance page for the eclipse-sim project. Sources: the repo's
       ROADMAP.md (the brief), LOG.md (iterations), WALL.md (numbers),
-      LESSONS.md (the debugging story). V2: shared MainLayout shell; back-link
-      retired (the persistent sidebar nav is the path back). */}
+      LESSONS.md (the debugging story). V2.1: shared MainLayout shell + explicit
+      back-link to the wall it's linked from. */}
   <main class="colophon">
+    <p class="colophon-back"><a href="/projects.html">← Projects</a></p>
     <h2 class="page-title">How eclipse-sim was built</h2>
 
     <p>

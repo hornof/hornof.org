@@ -46,9 +46,10 @@ function buildBits(b: {
   bodyClass="page-fixed"
 >
   {/* F17: Projects wall, rendered at build time from the projects collection.
-      V2: renders into the shared MainLayout shell (persistent sidebar); the
-      per-page "← Luke Hornof" back-link retired (the sidebar name is home). */}
+      V2.1: shared MainLayout shell + an explicit back-link — the sidebar name
+      alone didn't read as a way home, so the subpage felt stranded. */}
   <main class="projects">
+    <p class="colophon-back"><a href="/">← Luke Hornof</a></p>
     <h2 class="page-title">Projects</h2>
     <p class="projects-intro">
       A growing wall of builds. Each one records how it was made — the stack, the

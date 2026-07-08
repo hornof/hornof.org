@@ -32,8 +32,32 @@ test.describe("V2: the sidebar renders on every route", () => {
       await expect(page.locator(".sidebar .name a")).toHaveAttribute("href", "/");
       await expect(page.locator(".sidebar .section-nav a")).toHaveCount(5);
       await expect(page.locator(".sidebar nav.social a")).toHaveCount(7);
-      // No per-page back-link survives anywhere.
-      await expect(page.locator(".colophon-back")).toHaveCount(0);
+    });
+  }
+
+  // V2.1: an explicit per-page back-link into the site. The sidebar name alone
+  // didn't read as a way home, so content subpages carry a "← ..." link. Home is
+  // the root and 404 has its own inline nav, so neither shows one.
+  const BACK_LINKS = {
+    "/": null,
+    "/projects.html": { text: "Luke Hornof", href: "/" },
+    "/built-with.html": { text: "Projects", href: "/projects.html" },
+    "/eclipse-built.html": { text: "Projects", href: "/projects.html" },
+    "/404.html": null,
+  };
+  for (const [path, expected] of Object.entries(BACK_LINKS)) {
+    test(`${path} back-link is ${expected ? "present and correct" : "absent"}`, async ({
+      page,
+    }) => {
+      await page.goto(path);
+      const back = page.locator(".colophon-back a");
+      if (!expected) {
+        await expect(back).toHaveCount(0);
+      } else {
+        await expect(back).toHaveCount(1);
+        await expect(back).toHaveAttribute("href", expected.href);
+        await expect(back).toContainText(expected.text);
+      }
     });
   }
 
