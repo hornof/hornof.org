@@ -10,3 +10,47 @@
 - 2026-07-08 — V2 DONE. Added `src/layouts/MainLayout.astro` (persistent sidebar + slot, `transition:persist="sidebar"`, `astro:page-load`-driven active state); migrated all 5 pages (index/projects/built-with/eclipse-built/404) BaseLayout→MainLayout; retired `.colophon-back`; demoted subpage h1→`h2.page-title`; unified desktop scroll (`.content`/`.projects`/`.colophon` internal-scroll panes in the grid); mobile = stacked persistent header. CSS: `.name a` reset, `.page-title` rules, dropped dead `body.page-scroll`. Tests: new `tests/v2-sidebar.spec.js` (16: sidebar-on-every-route + SSR byte-identical + persistence-by-identity both directions + per-route active state + section-link-from-subpage + mobile stacked+persisted); updated layout/projects/builtwith specs for absolute hrefs + retired back-link + h2 title. Verified: SSR sidebar byte-identical on all 5 pages; screenshots (home/projects/built-with desktop + projects mobile) confirm shared shell, PROJECTS marked current, clean layout. Full suite 104/104 green on real build; Lighthouse root 98 / wall 100.
 - 2026-07-08 — V2 PR #24 opened (base v2/v1-land-look ← v2/v2-sidebar, stacked). Design decisions + deploy caveat in PR body for the V2 look-check gate.
 - 2026-07-08 — V3 DONE. Branch `v3/eclipse-embed` stacked on V2. Eclipse "Run it" now runs inside the site: detected by href (`projects/eclipse/`) → `data-eclipse-run` + `aria-haspopup=dialog`; a single modal `<dialog class="eclipse-lightbox">` (toolbar with "Open full screen ↗" passthrough link + close button, plus the iframe) rendered once on the wall. Iframe src is set ONLY on open and cleared on close (no wall load cost / stops the sim) — so no Lighthouse regression. Desktop (`min-width:880px`) intercepts the click → `showModal()`; mobile / no-`<dialog>` / no-JS all fall through to the full-screen navigation. Native dialog gives Esc + focus trap; close returns focus to the trigger; backdrop-click closes. Script re-wires on `astro:page-load`. CSS: `.eclipse-lightbox` top-layer flex pane + `::backdrop`. Tests: new `tests/eclipse-embed.spec.js` (6: closed-on-load + no-src, opens with correct src, close-btn dismiss + focus return + src cleared, Esc dismiss, full-screen link correct, mobile full-screen fallback). Verified: screenshot of the open lightbox shows the sim's controls/help-overlay/next-eclipse card/scrubber all usable inside the pane. Full suite 116/116 green; wall Lighthouse 100 (3 isolated runs; a 98 seen once under full-suite parallel contention), root 100.
+- 2026-07-08 — V4 DONE (report only — ZERO code executed). Branch `v4/techdebt-report` stacked on V3. Investigated all three debt items against the repo; recommendations written below; three NEEDS-LUKE entries filed in `loop/QUESTIONS.md` (Q3 dot-dirs, Q4 eclipse copy, Q5 PROVENANCE/sync). Nothing implemented — awaiting Luke's decisions.
+- 2026-07-08 — V4 PR #26 opened (base v3/eclipse-embed ← v4/techdebt-report, stacked; docs-only). HALT condition (a) reached: all four features accepted. Stacked PR chain: #23 (V1, base main) → #24 (V2) → #25 (V3) → #26 (V4). Suites: V1 88/88, V2 104/104, V3 116/116 green on real builds; Lighthouse root 98–100 / wall 99–100 (isolated). Deploy-artifact checks flagged per PR for Luke/Cowork (PR-22 lesson). Luke gates outstanding: V1 look-check (+opacity option), V2 sidebar look-check, V3 eclipse feel-check, V4 decisions Q3/Q4/Q5. Loop stopping cleanly.
+
+---
+
+## V4 — Tech-debt recommendations (report only; no execution)
+
+### Item 1 — Dot-directory archives (`/.2013/`, `/.2025/`)
+
+**Findings.**
+- On disk: `public/.2013/` (25 files — original Homestead multi-page site, verbatim 2013 snapshot) and `public/.2025/` (13 files — the GenAI rebuild snapshot; `index.html` + `work/{css,js,img,fonts}`). Astro copies `public/` → `dist/` verbatim, dot-dirs included.
+- **Link inventory — inbound refs to the dot paths: exactly two**, both the Tardis panel in `src/pages/index.astro` (`<a href="/.2013/" data-astro-reload>`, same for `.2025`). No other source/content reference.
+- **Internal safety:** grep found **no** dot-path references *inside* either archive — their internal links are relative/self-contained, so renaming the folder cannot break them.
+- **The quirk class:** `python -m http.server` and "some hosts" skip dot-dirs; whether Cloudflare Pages serves them is still UNVERIFIED (README caveat + `RUNBOOK-dns.md` Appendix A fallback: deploy-time copy to dot-free folders + a `_redirects` 200-rewrite, keeping `/.2013/` canonical). Tests exercise `/.2013/` and `/.2025/` (`tests/site.spec.js`, `tests/tardis.spec.js`).
+
+**Recommendation (rename to non-dot + permanent redirects).** Retire the whole quirk class:
+1. `git mv public/.2013 public/2013-archive` and `public/.2025 public/2025-archive` (names Luke's call — `2013-archive/` reads clearly; `archive/2013/` also fine).
+2. Update the two Tardis links in `index.astro` to the new paths.
+3. Add a repo-root/`public/_redirects` with **301** permanent redirects from the old canonical URLs: `/.2013/* /2013-archive/:splat 301` (and `.2025`). 301 (not the Appendix A 200-rewrite) because the goal is now a real move, preserving any external/Wayback inbound links.
+4. Update `tests/site.spec.js` + `tests/tardis.spec.js` to the new paths; retire `RUNBOOK-dns.md` Appendix A + the README dot-dir caveat.
+- **SEO notes:** archives are Easter-egg content (reached only via the Tardis), no sitemap entry, low index value — but 301s cost nothing and protect any deep links. Consider adding `X-Robots-Tag: noindex` (or a meta) to the archive HTML if you'd rather they stay unindexed.
+- **Cost:** low — one `git mv` per dir, one edit in `index.astro`, one `_redirects`, doc + test updates. **Trade-off:** the dot prefix was an intentional "hidden/archive" aesthetic (Chiang-style); renaming trades that for cross-host reliability and kills the dev-server 404 quirk. **Alternative if Luke prefers the aesthetic:** keep dot-dirs and rely on verify-on-preview + Appendix A — but that leaves the quirk class standing.
+- **DECISION NEEDED (Q3):** rename + 301 (recommended) vs keep dot-dirs; and the target folder names.
+
+### Item 2 — Eclipse code copy (`public/projects/eclipse/` snapshot)
+
+**Findings.** The sim is a copied snapshot (`index.html` + `src/`) with `PROVENANCE.txt` (source `github.com/hornof/eclipse-sim`, commit `6ffa1ee`, synced `2026-07-07T23:52Z`). `scripts/sync-projects.sh` re-copies from a **sibling checkout `../eclipse-sim`** (hardcoded relative path) and regenerates PROVENANCE. V3 now embeds this same-origin snapshot via iframe (`/projects/eclipse/`) and links it full-screen.
+
+**Ranked options (with costs).**
+- **A — keep snapshot + sync script (status quo). RECOMMENDED near-term.** Cost: ~0 infra; same-origin (V3 iframe has no cross-origin concerns); fully offline-reproducible. Con: snapshot drifts from source until someone runs the script; the `../eclipse-sim` sibling-path assumption is fragile/undocumented.
+- **B — per-project Pages subdomain** (`eclipse.hornof.org` or a second Pages project; the "option 2" from 7/7). Cost: one more Pages project + DNS subdomain; V3 iframe/full-screen retarget to the subdomain. Pro: always-current, no snapshot drift, clean separation. Con: cross-origin iframe (fine functionally; loses same-origin simplicity), a second deploy to babysit, DNS work (currently parked).
+- **C — build-time pull from source repo** (submodule or fetch during build). Cost: introduces a build step for content (against the repo's "no build step / self-contained" ethos), CI needs source-repo access. Pro: always-current without a manual sync. Con: most moving parts; brittlest CI.
+
+**Recommendation:** stay on **A** while the sim is stable (it is — V3 just shipped against it). Move to **B (subdomain)** only if the sim starts iterating often enough that snapshot staleness becomes real friction — and fold it into the parked DNS work rather than doing it standalone.
+- **DECISION NEEDED (Q4):** confirm A now / pre-approve B-when-iterating, or pick B/C.
+
+### Item 3 — PROVENANCE / sync-script freshness (conditional on Item 2)
+
+**Findings.** PROVENANCE pins commit `6ffa1ee` @ 2026-07-07; whether that equals current `eclipse-sim` HEAD is unverified from here (no sibling checkout in this worktree). The sync script has no staleness signal — nothing warns if the snapshot lags source.
+
+**Recommendation (depends on Q4).**
+- **If A kept:** (i) document the `../eclipse-sim` sibling-checkout assumption at the top of `sync-projects.sh`; (ii) add a lightweight freshness guard — an optional CI/test step that, when a sibling/source ref is available, warns if `PROVENANCE.txt` commit ≠ source HEAD (warn, don't fail — the snapshot is intentionally point-in-time); (iii) re-run the sync once to confirm `6ffa1ee` is current before the next deploy.
+- **If B chosen:** retire `PROVENANCE.txt` + `sync-projects.sh` (the subdomain becomes the source of truth); replace with a one-line pointer to the live sim + repo.
+- **DECISION NEEDED (Q5):** approve the freshness-guard + doc note (A path), or the retire-on-subdomain plan (B path).
