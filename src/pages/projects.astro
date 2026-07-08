@@ -17,6 +17,13 @@ const projects = (await getCollection("projects")).sort(
 const isPassthrough = (href: string) =>
   /(^|\/)\.20\d\d\//.test(href) || /projects\/eclipse\//.test(href);
 
+// V3: the eclipse "Run it" link runs the sim inside the site — a lightbox over
+// the wall on desktop, the full-screen link on mobile. Detect that link by its
+// href (the self-contained static app at projects/eclipse/) so the card data
+// stays plain; the script below upgrades it and everything degrades to the
+// full-screen navigation without JS.
+const isEclipseRun = (href: string) => /(^|\/)projects\/eclipse\/?$/.test(href);
+
 // The "how it was built" line — the differentiator, shown not hidden.
 function buildBits(b: {
   stack?: string;
@@ -70,7 +77,12 @@ function buildBits(b: {
               {d.links.length > 0 && (
                 <nav class="project-links" aria-label={`${d.title} links`}>
                   {d.links.map((l) => (
-                    <a href={l.href} data-astro-reload={isPassthrough(l.href) ? "" : undefined}>{l.label}</a>
+                    <a
+                      href={l.href}
+                      data-astro-reload={isPassthrough(l.href) ? "" : undefined}
+                      data-eclipse-run={isEclipseRun(l.href) ? "" : undefined}
+                      aria-haspopup={isEclipseRun(l.href) ? "dialog" : undefined}
+                    >{l.label}</a>
                   ))}
                 </nav>
               )}
@@ -79,5 +91,101 @@ function buildBits(b: {
         })
       }
     </div>
+
+    {/* V3: the eclipse sim runs inside the site. A native modal <dialog> gives
+        focus management + Esc close for free; the iframe's src is set only when
+        the lightbox opens (never on page load), so the wall carries no iframe
+        cost and Lighthouse holds. "Open full screen ↗" stays as the external
+        route — and is the mobile fallback (below the wall breakpoint the "Run
+        it" action IS this full-screen link, not the cramped pane). */}
+    <dialog
+      class="eclipse-lightbox"
+      aria-label="eclipse-sim — interactive solar-system orrery"
+    >
+      <div class="eclipse-lightbox-bar">
+        <span class="eclipse-lightbox-title">eclipse-sim</span>
+        <a
+          class="eclipse-lightbox-fullscreen"
+          href="projects/eclipse/"
+          data-astro-reload
+        >Open full screen &#8599;</a>
+        <button
+          type="button"
+          class="eclipse-lightbox-close"
+          aria-label="Close the eclipse-sim lightbox"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <iframe
+        class="eclipse-lightbox-frame"
+        title="eclipse-sim — interactive solar-system orrery"
+        loading="lazy"></iframe>
+    </dialog>
   </main>
+
+  <script>
+    // V3: run the eclipse sim inside the site. On desktop "Run it" opens the
+    // lightbox <dialog> with an iframe of the self-contained app; on mobile (or
+    // without <dialog> support / JS) the link falls through to the full-screen
+    // route. Re-wired on astro:page-load so it survives view-transition swaps;
+    // the dialog + link are re-rendered per navigation, so listeners never stack.
+    const SIM_SRC = "/projects/eclipse/";
+    const isDesktop = () => window.matchMedia("(min-width: 880px)").matches;
+
+    function initEclipseLightbox() {
+      const dialog = document.querySelector<HTMLDialogElement>(".eclipse-lightbox");
+      const runLinks = document.querySelectorAll<HTMLAnchorElement>(
+        "[data-eclipse-run]"
+      );
+      if (!dialog || !runLinks.length) return;
+
+      const frame = dialog.querySelector<HTMLIFrameElement>(".eclipse-lightbox-frame");
+      const closeBtn = dialog.querySelector<HTMLButtonElement>(
+        ".eclipse-lightbox-close"
+      );
+      let trigger: HTMLElement | null = null;
+
+      function openLightbox(t: HTMLElement) {
+        trigger = t;
+        // Load the sim only now (keeps it off the wall's initial load).
+        if (frame && frame.getAttribute("src") !== SIM_SRC) {
+          frame.setAttribute("src", SIM_SRC);
+        }
+        dialog!.showModal();
+      }
+
+      runLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          // Mobile → let the link navigate to the full-screen sim.
+          if (!isDesktop()) return;
+          // No native modal support → same full-screen fallback.
+          if (typeof dialog!.showModal !== "function") return;
+          e.preventDefault();
+          openLightbox(link);
+        });
+      });
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          if (dialog.open) dialog.close();
+        });
+      }
+
+      // Click on the backdrop (outside the dialog box) closes it.
+      dialog.addEventListener("click", (e) => {
+        if (e.target === dialog && dialog.open) dialog.close();
+      });
+
+      // close fires for Esc, the close button, and the backdrop — stop the sim
+      // (drop the src so it isn't running in the background) and return focus.
+      dialog.addEventListener("close", () => {
+        if (frame) frame.removeAttribute("src");
+        if (trigger && typeof trigger.focus === "function") trigger.focus();
+        trigger = null;
+      });
+    }
+
+    document.addEventListener("astro:page-load", initEclipseLightbox);
+  </script>
 </MainLayout>

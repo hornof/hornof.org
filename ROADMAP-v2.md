@@ -28,15 +28,15 @@
 - [x] Lighthouse holds: root 98 (≥98), wall 100 (≥99). Full suite 104/104 green on real build.
 - [ ] (Luke V2 sidebar look-check gate — see LOG design decisions; drawer remains a later option if the stack is disliked.)
 
-## V3 — Projects run inside the site (branch `v2/v3-eclipse-embed` off V2)
-- [ ] "Run it" opens eclipse sim in a modal `<dialog>` lightbox with `<iframe src="/projects/eclipse/" loading="lazy">` over the projects wall.
-- [ ] "Open full screen ↗" link kept inside the lightbox.
-- [ ] Mobile (below wall breakpoint): "Run it" resolves to the full-screen link, not the pane.
-- [ ] Test: "Run it" opens dialog; iframe present with correct src; Esc/close dismisses; focus returns to trigger.
-- [ ] Test: full-screen link present and correct.
-- [ ] Test: mobile "Run it" resolves to full-screen link.
-- [ ] No Lighthouse regression on the wall page.
-- [ ] (Luke feel-check gate.)
+## V3 — Projects run inside the site (branch `v3/eclipse-embed` off V2)
+- [x] "Run it" opens eclipse sim in a modal `<dialog>` lightbox with an `<iframe>` (src set on open, not at load) over the projects wall.
+- [x] "Open full screen ↗" link kept inside the lightbox (also the mobile fallback).
+- [x] Mobile (below 880px breakpoint): "Run it" resolves to the full-screen link, not the pane.
+- [x] Test: "Run it" opens dialog; iframe present with src `/projects/eclipse/`; Esc/close dismisses; focus returns to trigger.
+- [x] Test: full-screen link present and correct (`projects/eclipse/`, passthrough).
+- [x] Test: mobile "Run it" navigates to the full-screen sim.
+- [x] No Lighthouse regression on the wall page: wall 100 in 3 isolated runs (iframe carries no src until opened). Full suite 116/116 green.
+- [ ] (Luke eclipse-pane feel-check gate — screenshot in LOG confirms desktop controls/help-overlay usable inside the pane.)
 
 ## V4 — Tech-debt exploration (report only; branch `v2/v4-techdebt-report` off V3)
 - [ ] Item 1 — dot-dir archives (`/.2013/`, `/.2025/`): rename-to-non-dot plan + permanent redirects + link inventory + SEO/redirect notes → recommendation in LOG-v2.md.

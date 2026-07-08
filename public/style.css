@@ -618,6 +618,101 @@ p.colophon-back a:focus-visible {
     outline-offset: 3px;
 }
 
+/* ---- Eclipse lightbox (V3): the sim runs in a modal <dialog> over the wall.
+   Closed, a <dialog> is display:none (no layout cost); open, we make it a flex
+   column so the iframe fills the space below the toolbar. It lives in the top
+   layer, so the wall's overflow:auto pane never clips it. */
+.eclipse-lightbox {
+    padding: 0;
+    border: 1px solid var(--panel-edge);
+    border-radius: 16px;
+    width: min(94vw, 1100px);
+    height: min(90vh, 820px);
+    max-width: 94vw;
+    max-height: 90vh;
+    background: var(--panel);
+    color: var(--ink);
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(50, 32, 18, 0.35);
+}
+
+.eclipse-lightbox[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+.eclipse-lightbox::backdrop {
+    background: rgba(20, 12, 6, 0.55);
+}
+
+.eclipse-lightbox-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--panel-edge);
+    flex: 0 0 auto;
+}
+
+.eclipse-lightbox-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.eclipse-lightbox-fullscreen {
+    margin-left: auto;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--ink-soft);
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+}
+
+.eclipse-lightbox-fullscreen:hover,
+.eclipse-lightbox-fullscreen:focus-visible {
+    border-color: var(--ink);
+}
+
+.eclipse-lightbox-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.eclipse-lightbox-close:hover,
+.eclipse-lightbox-close:focus-visible {
+    background: var(--card);
+}
+
+.eclipse-lightbox-fullscreen:focus-visible,
+.eclipse-lightbox-close:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.eclipse-lightbox-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    border: 0;
+    background: #000;
+    display: block;
+}
+
 /* Sign-off: drops the Breton egg down into the pane's trailing space so the
    empty area below the last section reads as a deliberate end-of-page flourish.
    The 20vh top margin also does double duty as scroll-spy headroom (see the
