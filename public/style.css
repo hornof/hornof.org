@@ -143,19 +143,12 @@ body {
     box-shadow: 0 6px 24px rgba(50, 32, 18, 0.14);
 }
 
-/* The single-column pages get a little breathing room around their panel. */
+/* Mobile: the panels get a little breathing room around them (desktop zeroes
+   the top/bottom margin so the pane tops line up with the sidebar — see the
+   min-width:880px block). */
 .projects,
 .colophon {
     margin: 1.25rem auto;
-}
-
-/* The projects wall scrolls the whole page (not a fixed inner pane), so its
-   panel's top/bottom margin would collapse through <body> and disappear —
-   leaving it flush to the viewport edges. A block formatting context on the
-   body contains the margin so the breathing room shows. (The colophon pages
-   avoid this on desktop via body.page-fixed's overflow:hidden.) */
-body.page-scroll {
-    display: flow-root;
 }
 
 .sidebar {
@@ -209,6 +202,23 @@ body.page-scroll {
     font-weight: normal;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+}
+
+/* V2: the name is the site-wide home link. Keep it visually a heading (inherit
+   the ink colour, no underline) — it reads as identity, not a link, until hover. */
+.name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.name a:hover,
+.name a:focus-visible {
+    color: var(--ink);
+}
+
+.name a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
 }
 
 .tagline {
@@ -421,16 +431,23 @@ body.page-scroll {
 }
 
 /* Fixed-height frosted pane on desktop; the text scrolls within it — same
-   pattern as the main page's content column. Mobile scrolls the page. */
+   pattern as the main page's content column. Mobile scrolls the page.
+   V2: the projects wall now lives in the same shell (persistent sidebar), so it
+   scrolls inside its pane too — the sidebar stays put, matching .content and the
+   colophon pages. The desktop `margin` is zeroed top/bottom so these panes' tops
+   line up with the sidebar (the .layout padding already supplies the gutter);
+   `auto` sides keep the capped-width panels centred in the right column. */
 @media (min-width: 880px) {
     /* Only the pane scrolls, not the page. */
     body.page-fixed {
         overflow: hidden;
     }
-    .colophon {
+    .colophon,
+    .projects {
         height: calc(100vh - 2.5rem);
         overflow-y: auto;
         scroll-behavior: smooth;
+        margin: 0 auto;
     }
 }
 
@@ -451,7 +468,10 @@ p.colophon-back a:focus-visible {
     color: var(--ink);
 }
 
-.colophon h1 {
+/* V2: the single site h1 now lives in the sidebar (the name). Each subpage's
+   own title is an h2.page-title styled to match the old h1 — so the page reads
+   the same, but the document has exactly one h1 (the persistent identity). */
+.colophon .page-title {
     margin: 1.5rem 0 1.5rem;
     font-size: 1.7rem;
     font-weight: normal;
@@ -499,7 +519,7 @@ p.colophon-back a:focus-visible {
     padding: 4rem 2rem 6rem;
 }
 
-.projects h1 {
+.projects .page-title {
     margin: 1.5rem 0 0.75rem;
     font-size: 1.7rem;
     font-weight: normal;

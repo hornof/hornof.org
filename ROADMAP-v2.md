@@ -15,17 +15,18 @@
 - [ ] (Luke look-check: full-opacity readability bump offered as a one-line option in PR body — NOT baked in; his call.)
 
 ## V2 — Persistent sidebar, site-wide (branch `v2/v2-sidebar` off V1)
-- [ ] New `src/layouts/MainLayout.astro` composes `BaseLayout`, renders persistent sidebar + `<slot />`; all five pages migrate to it.
-- [ ] Sidebar carries `transition:persist="sidebar"`; SSR'd sidebar byte-identical on every route (no per-page active class in HTML).
-- [ ] Active state applied client-side via `astro:page-load`: scroll-spy on `/`, current-page marker elsewhere.
-- [ ] Nav links absolute (`/#experience`, `/projects.html`, …); section link from a subpage navigates home and scrolls to the section.
-- [ ] Per-page "← Luke Hornof" back-links retired; sidebar name is the home link.
-- [ ] Mobile: stacked persistent header (same node, still persisted) — NO drawer.
-- [ ] Test: persistence by element identity (runtime `data-persistProbe` stamp survives a nav).
-- [ ] Test: active state correct per route.
-- [ ] Test: section-link-from-subpage lands on the right section on home.
-- [ ] Test: mobile stacked header present and persisted at the mobile breakpoint.
-- [ ] Lighthouse holds on every page.
+- [x] New `src/layouts/MainLayout.astro` composes `BaseLayout`, renders persistent sidebar + `<slot />`; all five pages migrate to it.
+- [x] Sidebar carries `transition:persist="sidebar"`; SSR'd sidebar byte-identical on every route (verified: build-output diff + SSR-fetch test; no per-page active class in HTML).
+- [x] Active state applied client-side via `astro:page-load`: scroll-spy on `/`, current-page marker (Projects) on Projects-area pages, none on 404.
+- [x] Nav links absolute (`/#about`…`/#projects`); section link from a subpage navigates home and scrolls to the section (wall reached via the in-content "See all projects →").
+- [x] Per-page back-links (`.colophon-back`) retired; sidebar name wraps `<a href="/">` (home link). Subpage titles demoted h1→`h2.page-title` → exactly one h1 per page.
+- [x] Mobile: sidebar collapses to a stacked persistent header (same persisted node) — NO drawer.
+- [x] Test: persistence by element identity (runtime `data-persist-probe` stamp survives a nav, both directions).
+- [x] Test: active state correct per route (home spy / Projects-area current / 404 none).
+- [x] Test: section-link-from-subpage lands on the right section on home.
+- [x] Test: mobile stacked header present and persisted at the mobile breakpoint.
+- [x] Lighthouse holds: root 98 (≥98), wall 100 (≥99). Full suite 104/104 green on real build.
+- [ ] (Luke V2 sidebar look-check gate — see LOG design decisions; drawer remains a later option if the stack is disliked.)
 
 ## V3 — Projects run inside the site (branch `v2/v3-eclipse-embed` off V2)
 - [ ] "Run it" opens eclipse sim in a modal `<dialog>` lightbox with `<iframe src="/projects/eclipse/" loading="lazy">` over the projects wall.

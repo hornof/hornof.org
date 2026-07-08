@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import MainLayout from "../layouts/MainLayout.astro";
 import { getCollection } from "astro:content";
 
 // F17 (E3.1): the wall is generated at build time from the `projects` content
@@ -33,16 +33,16 @@ function buildBits(b: {
 }
 ---
 
-<BaseLayout
+<MainLayout
   title="Projects — Luke Hornof"
   description="A growing wall of builds — each one documenting how it was made, which agents and models built it, and what it cost."
-  bodyClass="page-scroll"
+  bodyClass="page-fixed"
 >
-  {/* F17: Projects wall, rendered at build time from the projects collection. */}
+  {/* F17: Projects wall, rendered at build time from the projects collection.
+      V2: renders into the shared MainLayout shell (persistent sidebar); the
+      per-page "← Luke Hornof" back-link retired (the sidebar name is home). */}
   <main class="projects">
-    <p class="colophon-back"><a href="/">&larr; Luke Hornof</a></p>
-
-    <h1>Projects</h1>
+    <h2 class="page-title">Projects</h2>
     <p class="projects-intro">
       A growing wall of builds. Each one records how it was made — the stack, the
       agents and models, the tests, the cost — because how a thing gets built is
@@ -80,4 +80,4 @@ function buildBits(b: {
       }
     </div>
   </main>
-</BaseLayout>
+</MainLayout>

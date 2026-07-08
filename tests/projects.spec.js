@@ -17,8 +17,9 @@ const SOURCE = () =>
 test.describe("F11: reachable from the site", () => {
   test("Projects is an on-page section that links out to the wall", async ({ page }) => {
     await page.goto("/");
-    // Projects is now an in-page nav anchor (like the other sections), not a page link.
-    const navLink = page.locator('.section-nav a[href="#projects"]');
+    // Projects is an in-page nav anchor (like the other sections), not a page
+    // link. V2: nav hrefs are absolute so a section link works from any route.
+    const navLink = page.locator('.section-nav a[href="/#projects"]');
     await expect(navLink).toHaveCount(1);
     await expect(navLink).toHaveText(/projects/i);
     await expect(page.locator("section#projects")).toHaveCount(1);
@@ -37,7 +38,9 @@ test.describe("F11: reachable from the site", () => {
     await wallLink.click();
     await page.waitForURL(/projects/);
     await expect(page).toHaveURL(/projects/);
-    await expect(page.locator("h1")).toHaveText(/projects/i);
+    // V2: the single h1 is the persistent sidebar name; the wall's own title is
+    // now an h2.page-title. Assert we landed on the wall via that title + cards.
+    await expect(page.locator(".projects .page-title")).toHaveText(/projects/i);
     await expect(page.locator(".project-card").first()).toBeVisible();
   });
 });

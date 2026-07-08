@@ -1,17 +1,16 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import MainLayout from "../layouts/MainLayout.astro";
 ---
 
-<BaseLayout
+<MainLayout
   title="Built with — Luke Hornof"
   description="How hornof.org was built: a small static site shipped by an agentic engineering loop, one tested PR at a time."
   bodyClass="page-fixed"
 >
-  {/* F8: colophon / transparency page. Copy source is content/built-with.md. */}
+  {/* F8: colophon / transparency page. Copy source is content/built-with.md.
+      V2: shared MainLayout shell; back-link retired (sidebar nav is the path). */}
   <main class="colophon">
-    <p class="colophon-back"><a href="projects.html">&larr; Projects</a></p>
-
-    <h1>Built with</h1>
+    <h2 class="page-title">Built with</h2>
 
     <p>
       This site is deliberately small — and still ships no tracking. It's built
@@ -47,4 +46,4 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       >.
     </p>
   </main>
-</BaseLayout>
+</MainLayout>
