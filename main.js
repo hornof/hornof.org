@@ -306,12 +306,14 @@
     var last = sections[sections.length - 1];
     var first = sections[0];
     function edgeGuard() {
+      // Recompute the scroll box each call so this stays correct across the
+      // mobile/desktop breakpoint (the page scrolls on mobile, the pane on desktop).
+      var box = scrollContainer();
       var atBottom, atTop;
-      if (container) {
+      if (box) {
         atBottom =
-          container.scrollTop + container.clientHeight >=
-          container.scrollHeight - 2;
-        atTop = container.scrollTop <= 2;
+          box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
+        atTop = box.scrollTop <= 2;
       } else {
         var doc = document.documentElement;
         atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
@@ -323,7 +325,13 @@
     (container || window).addEventListener("scroll", edgeGuard, {
       passive: true,
     });
-    edgeGuard(); // set initial state on load
+    edgeGuard(); // initial state
+    // Re-assert once the layout settles and on resize. On mobile the tall sidebar
+    // pushes every section below the spy band at the top, so the observer alone
+    // (which only sets on intersect, never clears) can leave a stale link lit
+    // until the first scroll. The load/resize passes correct that.
+    window.addEventListener("load", edgeGuard);
+    window.addEventListener("resize", edgeGuard, { passive: true });
   }
 
   // The scrollable ancestor of the sections, or null when the page itself

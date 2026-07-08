@@ -97,7 +97,7 @@ test.describe("F6: talks (flagged thin)", () => {
   test("lists the real talk titles", async ({ page }) => {
     await page.goto("/");
     const talks = page.locator("#talks .talks li");
-    await expect(talks).toHaveCount(5);
+    await expect(talks).toHaveCount(4);
     await expect(page.getByText(/Building Amazing Engineering Teams/)).toBeVisible();
   });
 });

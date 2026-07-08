@@ -136,7 +136,12 @@ body::after {
 
 .content {
     padding: 2.5rem;
-    padding-bottom: 35vh; /* room so any section can scroll under the spy line */
+    /* Trailing scroll room (see .page-sign-off). The pane is a fixed-height
+       internal scroller, so the second-to-last section (Talks) needs ~28vh of
+       room below it to scroll to the top and light up its nav link. That room is
+       now split between the sign-off's top margin (which drops the Breton egg
+       down into the space) and this padding below it — together ~30vh. */
+    padding-bottom: 10vh;
 }
 
 @media (min-width: 880px) {
@@ -305,6 +310,14 @@ body::after {
     font-size: 1.15rem;
 }
 
+/* Separate stacked paragraphs (the About bio, the Projects intro + its link).
+   The base rule above zeroes margins so a section's first paragraph sits tight
+   under its heading; this restores spacing only between consecutive paragraphs,
+   which were otherwise running together as one wall of text. */
+.content section p + p {
+    margin-top: 1rem;
+}
+
 .content a {
     color: var(--ink);
 }
@@ -316,6 +329,24 @@ body::after {
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+/* When a list follows an intro line (Talks: "…Recent topics:"), separate the
+   first item from the paragraph — otherwise it butts against the text while
+   every later item carries its own gap. Only the p→list case is affected;
+   Experience/Publications run straight from the heading into the list. */
+.content section p + ul {
+    margin-top: 1rem;
+}
+
+/* The last item spaces the list with margin-bottom like the others, but its
+   margin spills past the list into the inter-section gap — making sections
+   that end in a list taller than ones that end in a paragraph. Zero it so the
+   section's own padding sets a uniform gap between every section. */
+.cv li:last-child,
+.pubs li:last-child,
+.talks li:last-child {
+    margin-bottom: 0;
 }
 
 .cv li {
@@ -345,36 +376,15 @@ body::after {
     font-size: 1.05rem;
 }
 
-.more {
-    margin-top: 1.25rem;
+/* "Complete list" link after the publications list. Scoped under .content so it
+   beats `.content section p { margin: 0 }`, which was flattening its top margin
+   to zero and jamming it against the last publication. */
+.content section .more {
+    margin-top: 1.5rem;
     font-size: 1rem;
 }
 
 /* ---- Colophon (F8): subtle link on the one-pager + the built-with page ---- */
-.colophon-link {
-    margin-top: 3rem;
-    max-width: 42rem;
-}
-
-.colophon-link a {
-    color: var(--ink-soft);
-    text-decoration: none;
-    font-size: 0.8rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    transition: color 0.2s ease;
-}
-
-.colophon-link a:hover,
-.colophon-link a:focus-visible {
-    color: var(--ink);
-}
-
-.colophon-link a:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
-}
-
 .colophon {
     max-width: 40rem;
     margin: 1.25rem auto;
@@ -552,11 +562,19 @@ body::after {
     outline-offset: 3px;
 }
 
+/* Sign-off: drops the Breton egg down into the pane's trailing space so the
+   empty area below the last section reads as a deliberate end-of-page flourish.
+   The 20vh top margin also does double duty as scroll-spy headroom (see the
+   .content padding-bottom note). */
+.page-sign-off {
+    margin-top: 20vh;
+    text-align: center;
+}
+
 /* ---- Breton Easter egg (F9): faint fleur-de-lis → nod to Brittany ---- */
 .breton {
     position: relative;
     display: inline-block;
-    margin-left: 0.75rem;
 }
 
 .breton-toggle {
@@ -564,10 +582,10 @@ body::after {
     border: none;
     background: none;
     color: var(--ink-soft);
-    font-size: 0.85rem;
+    font-size: 1rem;
     line-height: 1;
     cursor: pointer;
-    opacity: 0.35;
+    opacity: 0.4;
     transition: opacity 0.2s ease, color 0.2s ease;
 }
 
@@ -586,7 +604,9 @@ body::after {
 
 .breton-panel {
     position: absolute;
-    left: 0;
+    left: 50%; /* centered sign-off: open the panel centered above the mark, up
+                  into the empty trailing space (no text to overlap) */
+    transform: translateX(-50%);
     bottom: 140%;
     z-index: 10;
     display: flex;
