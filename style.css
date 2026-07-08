@@ -130,6 +130,15 @@ body::after {
     margin: 1.25rem auto;
 }
 
+/* The projects wall scrolls the whole page (not a fixed inner pane), so its
+   panel's top/bottom margin would collapse through <body> and disappear —
+   leaving it flush to the viewport edges. A block formatting context on the
+   body contains the margin so the breathing room shows. (The colophon pages
+   avoid this on desktop via body.page-fixed's overflow:hidden.) */
+body.page-scroll {
+    display: flow-root;
+}
+
 .sidebar {
     padding: 2.5rem;
 }
@@ -359,8 +368,9 @@ body::after {
 
 .cv-when {
     color: var(--ink-soft);
-    font-size: 0.9rem;
-    letter-spacing: 0.04em;
+    /* Matches .project-date — both are small date/period metadata. */
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
     white-space: nowrap;
 }
 
@@ -405,16 +415,20 @@ body::after {
     }
 }
 
-.colophon-back a {
+/* `p.` prefix so this beats `.colophon a { color: var(--ink) }` (equal class
+   specificity, defined later) — otherwise the back link renders full-dark and
+   its hover has nothing to darken, unlike every other lighter→darker link. */
+p.colophon-back a {
     color: var(--ink-soft);
     text-decoration: none;
     font-size: 0.8rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    transition: color 0.2s ease;
 }
 
-.colophon-back a:hover,
-.colophon-back a:focus-visible {
+p.colophon-back a:hover,
+p.colophon-back a:focus-visible {
     color: var(--ink);
 }
 
@@ -441,7 +455,9 @@ body::after {
 
 .colophon code {
     font-family: "SF Mono", "Menlo", "Consolas", monospace;
-    font-size: 0.8em;
+    /* Monospace reads larger than the surrounding serif at the same em (wider,
+       heavier glyphs), so it's dialled below the naive ratio to sit inline. */
+    font-size: 0.72em;
     padding: 0 0.25em;
     border-radius: 3px;
     background: rgba(90, 56, 37, 0.05);
@@ -458,7 +474,9 @@ body::after {
 /* ---- Projects wall (F11) ---- */
 .projects {
     max-width: 44rem;
-    margin: 0 auto;
+    /* 1.25rem top/bottom so the panel gets the same breathing room off the
+       viewport edges as the colophon panels — not flush to the top and bottom. */
+    margin: 1.25rem auto;
     padding: 4rem 2rem 6rem;
 }
 
@@ -472,7 +490,6 @@ body::after {
     margin: 0 0 2.5rem;
     font-size: 1.1rem;
     max-width: 34rem;
-    color: var(--ink-soft);
 }
 
 .projects-list {
