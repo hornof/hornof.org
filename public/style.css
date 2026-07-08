@@ -19,7 +19,7 @@
     /* Wash quiets the busy panorama so text reads (Luke's tuner pick 2026-07-07). */
     --scrim: linear-gradient(160deg, rgba(214, 190, 150, 0.51) 0%, rgba(184, 156, 116, 0.57) 100%);
     /* Frosted panel: near-neutral cream at 67% — solid enough for crisp body copy. */
-    --panel: rgba(250, 249, 246, 0.67);
+    --panel: rgba(250, 249, 246, 0.85);
     --panel-edge: rgba(90, 56, 37, 0.14);
 }
 
@@ -43,7 +43,7 @@
     /* Dark mode keeps a wash so the bright panorama still reads "dark"; panel is
        a translucent warm-dark to mirror the light theme's 50% feel. */
     --scrim: linear-gradient(160deg, rgba(20, 13, 7, 0.46) 0%, rgba(10, 6, 3, 0.56) 100%);
-    --panel: rgba(30, 21, 12, 0.67);
+    --panel: rgba(30, 21, 12, 0.85);
     --panel-edge: rgba(236, 224, 203, 0.12);
 }
 
@@ -116,6 +116,10 @@ body {
 /* (The old @keyframes zoomBackground was retired in F16 — the zoom is now a
    WAAPI animation started in BaseLayout so its phase survives navigations.) */
 
+/* Page transitions: panels are plain translucent (no backdrop-filter), so the page
+   snapshots cleanly and Astro's native <ClientRouter/> cross-fade (BaseLayout) runs
+   as-is. Reduced motion still gets an instant swap — see the media query far below. */
+
 /* ---- Layout: fixed left sidebar + scrolling content (F5) ---- */
 .layout {
     max-width: 1200px;
@@ -123,16 +127,17 @@ body {
     padding: 1.25rem; /* gutter so the panorama frames the frosted panels */
 }
 
-/* Frosted-glass panels: translucent + blurred backdrop so the panorama blurs
-   softly behind the text (legible) while staying crisp in the margins/gutter.
-   Also used by the Projects wall and the Built-with page (same shell). */
+/* Translucent panels: the panorama shows softly through a semi-opaque panel so the
+   text stays legible while the background still frames it. The live backdrop-filter
+   blur was dropped — it's the one CSS property a view-transition snapshot can't
+   capture, so removing it lets pages cross-fade cleanly. Panel opacity (--panel)
+   is bumped to compensate for the lost blur. Also used by the Projects wall and the
+   Built-with page (same shell). */
 .sidebar,
 .content,
 .projects,
 .colophon {
     background: var(--panel);
-    -webkit-backdrop-filter: blur(12px) saturate(1.15);
-    backdrop-filter: blur(12px) saturate(1.15);
     border: 1px solid var(--panel-edge);
     border-radius: 16px;
     box-shadow: 0 6px 24px rgba(50, 32, 18, 0.14);
@@ -647,8 +652,6 @@ p.colophon-back a:focus-visible {
     max-width: 18rem;
     padding: 0.6rem 0.85rem;
     background: var(--panel);
-    -webkit-backdrop-filter: blur(12px) saturate(1.15);
-    backdrop-filter: blur(12px) saturate(1.15);
     border: 1px solid var(--panel-edge);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(90, 56, 37, 0.25);
@@ -756,8 +759,6 @@ p.colophon-back a:focus-visible {
     border-radius: 50%;
     border: 1px solid var(--panel-edge);
     background: var(--panel);
-    -webkit-backdrop-filter: blur(12px) saturate(1.15);
-    backdrop-filter: blur(12px) saturate(1.15);
     color: var(--ink);
     font-size: 16px;
     line-height: 1;
@@ -878,8 +879,6 @@ p.colophon-back a:focus-visible {
     flex-direction: column;
     gap: 2px;
     background: var(--panel);
-    -webkit-backdrop-filter: blur(12px) saturate(1.15);
-    backdrop-filter: blur(12px) saturate(1.15);
     border: 1px solid var(--panel-edge);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(90, 56, 37, 0.25);
