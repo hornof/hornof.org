@@ -1,7 +1,6 @@
 # Feedback tracker — polish round 1
 
-> **STATE AS OF 7/6 ~11pm (fully reconciled by Cowork Claude — no stale lines; previous Q&A history removed, only decisions remain).**
-> Legend: ✅ done on the page · 🔨 decided, waiting for CLI to apply. Live preview: http://localhost:8788
+> **ROUND CLOSED 7/7 (Cowork Claude): all eight items applied and merged to main in PR #16 (f310ffa). Nothing in this file awaits action — kept as the record of round-1 decisions.**
 
 | # | Item | Status | Decision |
 |---|------|--------|----------|
@@ -14,7 +13,7 @@
 | 7 | 2024 archive | ✅ | `git rm -r .2024` done (recoverable via history); removed from tests. Docs still mention it — see note below. |
 | 8 | Background panorama | ✅ | Restored + optimized, frosted-glass text panels, both themes. |
 
-## CLI: apply these four things (1, 3, 6, 7), then this round is closed.
+## ~~CLI: apply these four things (1, 3, 6, 7)~~ — DONE, merged in PR #16. Round closed.
 
 ---
 
