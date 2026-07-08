@@ -187,12 +187,16 @@ test.describe("F13: self-documenting convention", () => {
       build: { stack: "Test stack", agents: "Claude Code", tests: 1 },
     };
     // Intercept the page and append one entry to the inlined JSON — nothing else.
+    // Capture the real entry count so the assertion stays correct as entries are
+    // added to projects.json (was hardcoded to 2 and broke when a 2nd real entry landed).
+    let realCount = 0;
     await page.route("**/projects.html", async (route) => {
       const resp = await route.fetch();
       const html = (await resp.text()).replace(
         /(<script type="application\/json" id="projects-data">)([\s\S]*?)(<\/script>)/,
         (_m, open, json, close) => {
           const arr = JSON.parse(json);
+          realCount = arr.length;
           arr.push(fixture);
           return open + "\n" + JSON.stringify(arr, null, 2) + "\n" + close;
         }
@@ -201,7 +205,7 @@ test.describe("F13: self-documenting convention", () => {
     });
 
     await page.goto("/projects.html");
-    await expect(page.locator(".project-card")).toHaveCount(2);
+    await expect(page.locator(".project-card")).toHaveCount(realCount + 1);
     const card = page.locator('.project-card[data-slug="fixture-demo"]');
     await expect(card).toContainText("Fixture Build");
     await expect(card.locator(".project-build")).toContainText("Test stack");
