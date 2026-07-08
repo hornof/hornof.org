@@ -1,8 +1,10 @@
 # Cloudflare Pages config for hornof.org.
-# No build step: the repo root IS the deploy output (plain HTML/CSS/JS).
+# Astro build: `npm run build` compiles the site to dist/, which Pages publishes.
+# (This file overrides the dashboard build settings, so the output dir must live
+# here — a stale "." here silently republishes source and ignores the build.)
 name = "hornof-org"
 compatibility_date = "2025-01-01"
-pages_build_output_dir = "."
+pages_build_output_dir = "dist"
 
 # Production branch = main; every PR gets a preview deploy automatically.
 # See README.md → "Deploy (Cloudflare Pages)" for the dot-directory archive caveat.
