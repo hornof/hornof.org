@@ -64,12 +64,18 @@ test.describe("F8: the page itself", () => {
     }
   });
 
-  test("offers a way back to the projects wall it's reached from", async ({ page }) => {
-    // This page is only linked from the hornof.org entry on the projects wall,
-    // so its back link returns there (matching eclipse-built.html), not home.
-    const back = page.locator(".colophon-back a");
-    await expect(back).toBeVisible();
-    await expect(back).toHaveAttribute("href", "projects.html");
+  test("offers a way back into the site via the persistent sidebar", async ({ page }) => {
+    // V2: the per-page "← Projects" back-link retired. The persistent sidebar is
+    // the site-wide nav now — its name links home and its Projects section link
+    // (marked current on this Projects-area page) leads back to the wall.
+    const sidebar = page.locator(".sidebar");
+    await expect(sidebar).toBeVisible();
+    await expect(page.locator(".colophon-back")).toHaveCount(0);
+    const home = page.locator(".sidebar .name a");
+    await expect(home).toHaveAttribute("href", "/");
+    const projects = page.locator('.sidebar .section-nav a[href="/#projects"]');
+    await expect(projects).toBeVisible();
+    await expect(projects).toHaveAttribute("aria-current", "true");
   });
 
   test("shares the site stylesheet (visual consistency)", async ({ page }) => {

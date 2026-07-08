@@ -143,19 +143,12 @@ body {
     box-shadow: 0 6px 24px rgba(50, 32, 18, 0.14);
 }
 
-/* The single-column pages get a little breathing room around their panel. */
+/* Mobile: the panels get a little breathing room around them (desktop zeroes
+   the top/bottom margin so the pane tops line up with the sidebar — see the
+   min-width:880px block). */
 .projects,
 .colophon {
     margin: 1.25rem auto;
-}
-
-/* The projects wall scrolls the whole page (not a fixed inner pane), so its
-   panel's top/bottom margin would collapse through <body> and disappear —
-   leaving it flush to the viewport edges. A block formatting context on the
-   body contains the margin so the breathing room shows. (The colophon pages
-   avoid this on desktop via body.page-fixed's overflow:hidden.) */
-body.page-scroll {
-    display: flow-root;
 }
 
 .sidebar {
@@ -209,6 +202,23 @@ body.page-scroll {
     font-weight: normal;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+}
+
+/* V2: the name is the site-wide home link. Keep it visually a heading (inherit
+   the ink colour, no underline) — it reads as identity, not a link, until hover. */
+.name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.name a:hover,
+.name a:focus-visible {
+    color: var(--ink);
+}
+
+.name a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
 }
 
 .tagline {
@@ -421,16 +431,23 @@ body.page-scroll {
 }
 
 /* Fixed-height frosted pane on desktop; the text scrolls within it — same
-   pattern as the main page's content column. Mobile scrolls the page. */
+   pattern as the main page's content column. Mobile scrolls the page.
+   V2: the projects wall now lives in the same shell (persistent sidebar), so it
+   scrolls inside its pane too — the sidebar stays put, matching .content and the
+   colophon pages. The desktop `margin` is zeroed top/bottom so these panes' tops
+   line up with the sidebar (the .layout padding already supplies the gutter);
+   `auto` sides keep the capped-width panels centred in the right column. */
 @media (min-width: 880px) {
     /* Only the pane scrolls, not the page. */
     body.page-fixed {
         overflow: hidden;
     }
-    .colophon {
+    .colophon,
+    .projects {
         height: calc(100vh - 2.5rem);
         overflow-y: auto;
         scroll-behavior: smooth;
+        margin: 0 auto;
     }
 }
 
@@ -451,7 +468,10 @@ p.colophon-back a:focus-visible {
     color: var(--ink);
 }
 
-.colophon h1 {
+/* V2: the single site h1 now lives in the sidebar (the name). Each subpage's
+   own title is an h2.page-title styled to match the old h1 — so the page reads
+   the same, but the document has exactly one h1 (the persistent identity). */
+.colophon .page-title {
     margin: 1.5rem 0 1.5rem;
     font-size: 1.7rem;
     font-weight: normal;
@@ -499,7 +519,7 @@ p.colophon-back a:focus-visible {
     padding: 4rem 2rem 6rem;
 }
 
-.projects h1 {
+.projects .page-title {
     margin: 1.5rem 0 0.75rem;
     font-size: 1.7rem;
     font-weight: normal;
@@ -596,6 +616,101 @@ p.colophon-back a:focus-visible {
 .project-links a:focus-visible {
     outline: 2px solid var(--ink);
     outline-offset: 3px;
+}
+
+/* ---- Eclipse lightbox (V3): the sim runs in a modal <dialog> over the wall.
+   Closed, a <dialog> is display:none (no layout cost); open, we make it a flex
+   column so the iframe fills the space below the toolbar. It lives in the top
+   layer, so the wall's overflow:auto pane never clips it. */
+.eclipse-lightbox {
+    padding: 0;
+    border: 1px solid var(--panel-edge);
+    border-radius: 16px;
+    width: min(94vw, 1100px);
+    height: min(90vh, 820px);
+    max-width: 94vw;
+    max-height: 90vh;
+    background: var(--panel);
+    color: var(--ink);
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(50, 32, 18, 0.35);
+}
+
+.eclipse-lightbox[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+.eclipse-lightbox::backdrop {
+    background: rgba(20, 12, 6, 0.55);
+}
+
+.eclipse-lightbox-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--panel-edge);
+    flex: 0 0 auto;
+}
+
+.eclipse-lightbox-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.eclipse-lightbox-fullscreen {
+    margin-left: auto;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--ink-soft);
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+}
+
+.eclipse-lightbox-fullscreen:hover,
+.eclipse-lightbox-fullscreen:focus-visible {
+    border-color: var(--ink);
+}
+
+.eclipse-lightbox-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.eclipse-lightbox-close:hover,
+.eclipse-lightbox-close:focus-visible {
+    background: var(--card);
+}
+
+.eclipse-lightbox-fullscreen:focus-visible,
+.eclipse-lightbox-close:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.eclipse-lightbox-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    border: 0;
+    background: #000;
+    display: block;
 }
 
 /* Sign-off: drops the Breton egg down into the pane's trailing space so the

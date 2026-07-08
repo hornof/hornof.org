@@ -1,15 +1,15 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import MainLayout from "../layouts/MainLayout.astro";
 ---
 
-<BaseLayout
+<MainLayout
   title="Not found — Luke Hornof"
   bodyClass="page-fixed"
   assetBase="/"
   noindex={true}
 >
   <main class="colophon">
-    <h1>404 — not found</h1>
+    <h2 class="page-title">404 — not found</h2>
     <p>
       No page lives at this address. It may have moved when the site was rebuilt
       in 2026.
@@ -20,4 +20,4 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       >
     </p>
   </main>
-</BaseLayout>
+</MainLayout>

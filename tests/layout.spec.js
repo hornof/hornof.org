@@ -48,13 +48,13 @@ test.describe("F5: scroll-spy nav", () => {
   test("nav exposes a link per section", async ({ page }) => {
     await page.goto("/");
     for (const id of SECTIONS) {
-      await expect(page.locator(`.section-nav a[href="#${id}"]`)).toHaveCount(1);
+      await expect(page.locator(`.section-nav a[href="/#${id}"]`)).toHaveCount(1);
     }
   });
 
   test("first section is active on load", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(`.section-nav a[href="#${SECTIONS[0]}"]`)).toHaveAttribute(
+    await expect(page.locator(`.section-nav a[href="/#${SECTIONS[0]}"]`)).toHaveAttribute(
       "aria-current",
       "true"
     );
@@ -68,7 +68,7 @@ test.describe("F5: scroll-spy nav", () => {
     // the first scroll. The load/resize edgeGuard passes must correct that.
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
-    await expect(page.locator(`.section-nav a[href="#${SECTIONS[0]}"]`)).toHaveAttribute(
+    await expect(page.locator(`.section-nav a[href="/#${SECTIONS[0]}"]`)).toHaveAttribute(
       "aria-current",
       "true"
     );
@@ -88,7 +88,7 @@ test.describe("F5: scroll-spy nav", () => {
         document.getElementById(sid).scrollIntoView({ block: "start" });
       }, id);
 
-      const activeLink = page.locator(`.section-nav a[href="#${id}"]`);
+      const activeLink = page.locator(`.section-nav a[href="/#${id}"]`);
       await expect(activeLink).toHaveAttribute("aria-current", "true");
       // Exactly one nav link is active at a time.
       await expect(page.locator('.section-nav a[aria-current="true"]')).toHaveCount(1);
@@ -101,7 +101,7 @@ test.describe("F5: scroll-spy nav", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
 
-    const talks = page.locator('.section-nav a[href="#talks"]');
+    const talks = page.locator('.section-nav a[href="/#talks"]');
     await talks.focus();
     await expect(talks).toBeFocused();
     await page.keyboard.press("Enter");
