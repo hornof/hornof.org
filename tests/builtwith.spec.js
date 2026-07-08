@@ -5,21 +5,26 @@
 // lighthouse.spec.js on the root page).
 const { test, expect, request } = require("@playwright/test");
 
-test.describe("F8: reachable from the main page", () => {
-  test("a subtle colophon link points to the built-with page", async ({
+test.describe("F8: reachable via the projects wall", () => {
+  // The home page no longer carries a direct "how this site was built" link
+  // (redundant — the site is the first entry on the projects wall, which links
+  // to the built-with page). Reachability now runs through that entry.
+  test("the built-with page is linked from the hornof.org projects entry and loads 200", async ({
+    page,
+  }) => {
+    await page.goto("/projects.html");
+    const link = page.locator('a[href*="built-with"]').first();
+    await expect(link).toBeVisible();
+    const href = await link.getAttribute("href");
+    const resp = await page.request.get(new URL(href, page.url()).href);
+    expect(resp.status(), "built-with status").toBe(200);
+  });
+
+  test("the home page no longer carries a direct built-with link", async ({
     page,
   }) => {
     await page.goto("/");
-    const link = page.locator('a[href*="built-with"]');
-    await expect(link).toHaveCount(1);
-    await expect(link).toBeVisible();
-
-    const resp = await Promise.all([
-      page.waitForNavigation(),
-      link.click(),
-    ]).then(([nav]) => nav);
-    expect(resp && resp.status(), "built-with status").toBe(200);
-    await expect(page).toHaveURL(/built-with/);
+    await expect(page.locator('a[href*="built-with"]')).toHaveCount(0);
   });
 });
 
@@ -59,9 +64,12 @@ test.describe("F8: the page itself", () => {
     }
   });
 
-  test("offers a way back to the site", async ({ page }) => {
-    const home = page.locator('a[href="/"], a[href="index.html"], a[href="./"]');
-    await expect(home.first()).toBeVisible();
+  test("offers a way back to the projects wall it's reached from", async ({ page }) => {
+    // This page is only linked from the hornof.org entry on the projects wall,
+    // so its back link returns there (matching eclipse-built.html), not home.
+    const back = page.locator(".colophon-back a");
+    await expect(back).toBeVisible();
+    await expect(back).toHaveAttribute("href", "projects.html");
   });
 
   test("shares the site stylesheet (visual consistency)", async ({ page }) => {

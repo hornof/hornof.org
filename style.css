@@ -6,7 +6,7 @@
     --ink-soft: rgba(90, 56, 37, 0.6);
     --cream: #f2ebe0;      /* light earth tone (background top) */
     --tan: #cbb391;        /* warm earth tone (background bottom) */
-    --card: rgba(255, 255, 255, 0.92);
+    --card: rgba(255, 255, 255, 0.30); /* subtle lift for cards nested in the panel */
     --icon-filter: none;   /* social icons: brown PNGs, untouched in light mode */
     --serif: Garamond, Baskerville, "Hoefler Text", "Times New Roman", Times, serif;
     /* Tardis (F4) — earth-tone, not the Doctor Who blue, to match the site. */
@@ -16,10 +16,10 @@
     --tardis-window: #efe7d6;
     --tardis-lamp: #d3a24f;
     --tardis-line: #3f2716;
-    /* No wash — the panorama shows raw (Luke's tuner pick 2026-07-06). */
-    --scrim: linear-gradient(160deg, rgba(214, 190, 150, 0) 0%, rgba(184, 156, 116, 0.06) 100%);
-    /* Frosted panel: warm cream at 50% — translucent, art breathes through. */
-    --panel: rgba(244, 236, 218, 0.50);
+    /* Wash quiets the busy panorama so text reads (Luke's tuner pick 2026-07-07). */
+    --scrim: linear-gradient(160deg, rgba(214, 190, 150, 0.51) 0%, rgba(184, 156, 116, 0.57) 100%);
+    /* Frosted panel: near-neutral cream at 67% — solid enough for crisp body copy. */
+    --panel: rgba(250, 249, 246, 0.67);
     --panel-edge: rgba(90, 56, 37, 0.14);
 }
 
@@ -30,7 +30,7 @@
     --ink-soft: rgba(236, 224, 203, 0.6);
     --cream: #2a1d12;      /* deep roasted brown (background top) */
     --tan: #17100a;        /* near-black brown (background bottom) */
-    --card: rgba(42, 29, 18, 0.95);
+    --card: rgba(255, 255, 255, 0.05); /* barely-there lift on the dark panel */
     /* Recolour the brown social PNGs to the cream ink so they stay legible. */
     --icon-filter: brightness(0) invert(0.88) sepia(0.25);
     /* Lighter Tardis tones so it reads on the dark ground. */
@@ -43,7 +43,7 @@
     /* Dark mode keeps a wash so the bright panorama still reads "dark"; panel is
        a translucent warm-dark to mirror the light theme's 50% feel. */
     --scrim: linear-gradient(160deg, rgba(20, 13, 7, 0.46) 0%, rgba(10, 6, 3, 0.56) 100%);
-    --panel: rgba(30, 21, 12, 0.52);
+    --panel: rgba(30, 21, 12, 0.67);
     --panel-edge: rgba(236, 224, 203, 0.12);
 }
 
@@ -74,6 +74,12 @@ body::before {
     background: url("work/img/bg-panorama.webp") center center / cover no-repeat;
     filter: brightness(1.06) saturate(1.03); /* lift the panorama a touch */
     animation: zoomBackground 24s ease-in-out infinite alternate;
+}
+
+/* Dark mode dims the panorama (brightness down) rather than washing it, so the
+   machinery recedes into the dark ground instead of picking up a brown cast. */
+[data-theme="dark"] body::before {
+    filter: brightness(0.75) saturate(1.03);
 }
 
 body::after {
@@ -124,19 +130,33 @@ body::after {
     margin: 1.25rem auto;
 }
 
+/* The projects wall scrolls the whole page (not a fixed inner pane), so its
+   panel's top/bottom margin would collapse through <body> and disappear —
+   leaving it flush to the viewport edges. A block formatting context on the
+   body contains the margin so the breathing room shows. (The colophon pages
+   avoid this on desktop via body.page-fixed's overflow:hidden.) */
+body.page-scroll {
+    display: flow-root;
+}
+
 .sidebar {
     padding: 2.5rem;
 }
 
 .content {
     padding: 2.5rem;
-    padding-bottom: 35vh; /* room so any section can scroll under the spy line */
+    /* Trailing scroll room (see .page-sign-off). The pane is a fixed-height
+       internal scroller, so the second-to-last section (Talks) needs ~28vh of
+       room below it to scroll to the top and light up its nav link. That room is
+       now split between the sign-off's top margin (which drops the Breton egg
+       down into the space) and this padding below it — together ~30vh. */
+    padding-bottom: 10vh;
 }
 
 @media (min-width: 880px) {
     .layout {
         display: grid;
-        grid-template-columns: minmax(300px, 42%) 1fr;
+        grid-template-columns: minmax(300px, 36%) 1fr;
         gap: 1.25rem; /* panorama peeks through the gutter between panels */
         align-items: start;
         height: 100vh; /* lock both frames to the viewport */
@@ -279,17 +299,32 @@ body::after {
     padding-top: 0;
 }
 
+/* Section headings echo the sidebar's uppercase labels: the caps carry the
+   emphasis, so the size stays close to body copy (1.15rem) — just a hair
+   larger — instead of competing with the name and tagline in the sidebar. */
 .content h2 {
     margin: 0 0 1rem;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: normal;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
+/* Paragraphs and list items inherit the section's single measure (42rem)
+   rather than each carrying a tighter cap — otherwise headings, lists, and
+   paragraphs stop at three different right edges inside the wide content
+   pane, giving a ragged right margin that floats far from the pane edge. */
 .content section p {
     margin: 0;
     font-size: 1.15rem;
-    max-width: 34rem;
+}
+
+/* Separate stacked paragraphs (the About bio, the Projects intro + its link).
+   The base rule above zeroes margins so a section's first paragraph sits tight
+   under its heading; this restores spacing only between consecutive paragraphs,
+   which were otherwise running together as one wall of text. */
+.content section p + p {
+    margin-top: 1rem;
 }
 
 .content a {
@@ -305,9 +340,26 @@ body::after {
     padding: 0;
 }
 
+/* When a list follows an intro line (Talks: "…Recent topics:"), separate the
+   first item from the paragraph — otherwise it butts against the text while
+   every later item carries its own gap. Only the p→list case is affected;
+   Experience/Publications run straight from the heading into the list. */
+.content section p + ul {
+    margin-top: 1rem;
+}
+
+/* The last item spaces the list with margin-bottom like the others, but its
+   margin spills past the list into the inter-section gap — making sections
+   that end in a list taller than ones that end in a paragraph. Zero it so the
+   section's own padding sets a uniform gap between every section. */
+.cv li:last-child,
+.pubs li:last-child,
+.talks li:last-child {
+    margin-bottom: 0;
+}
+
 .cv li {
     margin-bottom: 1.1rem;
-    max-width: 36rem;
 }
 
 .cv-role {
@@ -316,8 +368,9 @@ body::after {
 
 .cv-when {
     color: var(--ink-soft);
-    font-size: 0.9rem;
-    letter-spacing: 0.04em;
+    /* Matches .project-date — both are small date/period metadata. */
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
     white-space: nowrap;
 }
 
@@ -330,40 +383,18 @@ body::after {
 .pubs li,
 .talks li {
     margin-bottom: 0.9rem;
-    max-width: 36rem;
     font-size: 1.05rem;
 }
 
-.more {
-    margin-top: 1.25rem;
+/* "Complete list" link after the publications list. Scoped under .content so it
+   beats `.content section p { margin: 0 }`, which was flattening its top margin
+   to zero and jamming it against the last publication. */
+.content section .more {
+    margin-top: 1.5rem;
     font-size: 1rem;
 }
 
 /* ---- Colophon (F8): subtle link on the one-pager + the built-with page ---- */
-.colophon-link {
-    margin-top: 3rem;
-    max-width: 42rem;
-}
-
-.colophon-link a {
-    color: var(--ink-soft);
-    text-decoration: none;
-    font-size: 0.8rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    transition: color 0.2s ease;
-}
-
-.colophon-link a:hover,
-.colophon-link a:focus-visible {
-    color: var(--ink);
-}
-
-.colophon-link a:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
-}
-
 .colophon {
     max-width: 40rem;
     margin: 1.25rem auto;
@@ -384,16 +415,20 @@ body::after {
     }
 }
 
-.colophon-back a {
+/* `p.` prefix so this beats `.colophon a { color: var(--ink) }` (equal class
+   specificity, defined later) — otherwise the back link renders full-dark and
+   its hover has nothing to darken, unlike every other lighter→darker link. */
+p.colophon-back a {
     color: var(--ink-soft);
     text-decoration: none;
     font-size: 0.8rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    transition: color 0.2s ease;
 }
 
-.colophon-back a:hover,
-.colophon-back a:focus-visible {
+p.colophon-back a:hover,
+p.colophon-back a:focus-visible {
     color: var(--ink);
 }
 
@@ -420,7 +455,9 @@ body::after {
 
 .colophon code {
     font-family: "SF Mono", "Menlo", "Consolas", monospace;
-    font-size: 0.8em;
+    /* Monospace reads larger than the surrounding serif at the same em (wider,
+       heavier glyphs), so it's dialled below the naive ratio to sit inline. */
+    font-size: 0.72em;
     padding: 0 0.25em;
     border-radius: 3px;
     background: rgba(90, 56, 37, 0.05);
@@ -437,7 +474,9 @@ body::after {
 /* ---- Projects wall (F11) ---- */
 .projects {
     max-width: 44rem;
-    margin: 0 auto;
+    /* 1.25rem top/bottom so the panel gets the same breathing room off the
+       viewport edges as the colophon panels — not flush to the top and bottom. */
+    margin: 1.25rem auto;
     padding: 4rem 2rem 6rem;
 }
 
@@ -451,7 +490,6 @@ body::after {
     margin: 0 0 2.5rem;
     font-size: 1.1rem;
     max-width: 34rem;
-    color: var(--ink-soft);
 }
 
 .projects-list {
@@ -462,9 +500,11 @@ body::after {
 
 .project-card {
     padding: 1.5rem 1.6rem;
+    /* A low-opacity lift (not a full panel, which would stack into a bright box)
+       so each card reads as a distinct surface inside the frosted .projects panel. */
     background: var(--card);
-    border: 1px solid var(--ink-soft);
-    border-radius: 10px;
+    border: 1px solid var(--panel-edge);
+    border-radius: 16px;
 }
 
 .project-head {
@@ -539,11 +579,19 @@ body::after {
     outline-offset: 3px;
 }
 
+/* Sign-off: drops the Breton egg down into the pane's trailing space so the
+   empty area below the last section reads as a deliberate end-of-page flourish.
+   The 20vh top margin also does double duty as scroll-spy headroom (see the
+   .content padding-bottom note). */
+.page-sign-off {
+    margin-top: 20vh;
+    text-align: center;
+}
+
 /* ---- Breton Easter egg (F9): faint fleur-de-lis → nod to Brittany ---- */
 .breton {
     position: relative;
     display: inline-block;
-    margin-left: 0.75rem;
 }
 
 .breton-toggle {
@@ -551,10 +599,10 @@ body::after {
     border: none;
     background: none;
     color: var(--ink-soft);
-    font-size: 0.85rem;
+    font-size: 1rem;
     line-height: 1;
     cursor: pointer;
-    opacity: 0.35;
+    opacity: 0.4;
     transition: opacity 0.2s ease, color 0.2s ease;
 }
 
@@ -573,7 +621,9 @@ body::after {
 
 .breton-panel {
     position: absolute;
-    left: 0;
+    left: 50%; /* centered sign-off: open the panel centered above the mark, up
+                  into the empty trailing space (no text to overlap) */
+    transform: translateX(-50%);
     bottom: 140%;
     z-index: 10;
     display: flex;

@@ -25,7 +25,7 @@
       })();
     </script>
 </head>
-<body>
+<body class="page-scroll">
     <!-- F7: dark/light theme toggle. JS sets its label + aria-pressed on load. -->
     <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch color theme">
         <span class="theme-toggle-icon" aria-hidden="true"></span>
@@ -52,14 +52,14 @@
       },
       {
         "label": "GitHub",
-        "href": "https://github.com/hornof/"
+        "href": "https://github.com/hornof/hornof.org"
       }
     ],
     "build": {
       "stack": "Plain HTML · one style.css · vanilla JS · Cloudflare Pages",
       "agents": "Claude Code",
       "models": "Opus 4.8",
-      "tests": 72,
+      "tests": 74,
       "firstPassGreen": "mostly — human review caught the rest",
       "costNote": "Tests written before code; every feature landed as its own reviewed PR, none straight to main."
     }

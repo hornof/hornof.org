@@ -9,8 +9,7 @@
 Speaking on engineering leadership and building in the AI era, at SF AI meetups
 and founder events. Recent topics:
 
-- Building Amazing Engineering Teams (AI-era update)
+- Building Amazing Engineering Teams
 - Bootstrapping a Startup — the Luminide story
 - Company Models — the AI OS for Companies
-- Where the High-Potential Startup Areas Are
-- The Times They Are AI-Changin' — startup essentials
+- The Times They Are AI-Changin'

@@ -4,7 +4,7 @@
 // section in view; keyboard navigable; single column on mobile.
 const { test, expect } = require("@playwright/test");
 
-const SECTIONS = ["about", "experience", "publications", "talks", "contact"];
+const SECTIONS = ["about", "experience", "publications", "talks", "projects"];
 
 test.describe("F5: sidebar layout", () => {
   test("desktop: sidebar sits left of the content and stays put on scroll", async ({
@@ -60,13 +60,28 @@ test.describe("F5: scroll-spy nav", () => {
     );
   });
 
+  test("mobile: first section is active on load (tall sidebar doesn't leave a stale link lit)", async ({
+    page,
+  }) => {
+    // On mobile the stacked sidebar pushes every section below the spy band at
+    // the top, so the observer alone can leave the wrong link highlighted until
+    // the first scroll. The load/resize edgeGuard passes must correct that.
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/");
+    await expect(page.locator(`.section-nav a[href="#${SECTIONS[0]}"]`)).toHaveAttribute(
+      "aria-current",
+      "true"
+    );
+    await expect(page.locator('.section-nav a[aria-current="true"]')).toHaveCount(1);
+  });
+
   test("scrolling a section into view lights up exactly its nav link", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
 
-    for (const id of ["talks", "publications", "contact"]) {
+    for (const id of ["talks", "publications", "projects"]) {
       // Drive by real scrolling — active state must come from scroll position,
       // not from any click handler.
       await page.evaluate((sid) => {
