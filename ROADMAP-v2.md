@@ -6,13 +6,13 @@
 > on stacked branches. Nothing merges to main — Luke merges.
 
 ## V1 — Land the look decision (branch `v2/v1-land-look` off `polish/live-session`)
-- [ ] Frost-workaround audit: confirm nothing in `BaseLayout`/`style.css` exists only to paper over frost; delete any remaining dead frost workarounds (keep panorama-continuity: WAAPI zoom capture/resume, `transition:persist` on bg layers).
-- [ ] `--panel` kept at local 0.85 values; native cross-fade unchanged.
-- [ ] Existing Playwright suite green against a real `npm run build` + preview.
-- [ ] Guard test added: computed-style asserts `.content`/`.sidebar`/`.projects`/`.colophon` report `backdrop-filter: none` in both themes.
-- [ ] Lighthouse: root ≥98, wall ≥99.
+- [x] Frost-workaround audit: confirmed nothing in `BaseLayout`/`style.css` exists only to paper over frost. Snapshot already clean — no `backdrop-filter` in shell CSS (only comments); `::view-transition-*{animation:none}` correctly scoped to reduced-motion block; old `@keyframes zoomBackground` retired (F16). Panorama-continuity machinery (WAAPI zoom capture/resume, `transition:persist` bg layers) kept. Nothing to delete.
+- [x] `--panel` kept at local 0.85 values; native cross-fade unchanged.
+- [x] Existing Playwright suite green against a real `npm run build` + preview (88/88 pass).
+- [x] Guard test added (`tests/frost-guard.spec.js`): computed-style asserts `.sidebar`/`.content` (/), `.projects` (/projects.html), `.colophon` (/built-with.html) report `backdrop-filter: none` in both themes (6 tests, all green).
+- [x] Lighthouse: root 98 (≥98), wall 99 (≥99).
 - [ ] (Deploy-artifact check on pages.dev — Luke/Cowork; flagged in PR body, not verifiable by worker.)
-- [ ] (Luke look-check: offer full-opacity readability bump as a one-line option — NOT baked in.)
+- [ ] (Luke look-check: full-opacity readability bump offered as a one-line option in PR body — NOT baked in; his call.)
 
 ## V2 — Persistent sidebar, site-wide (branch `v2/v2-sidebar` off V1)
 - [ ] New `src/layouts/MainLayout.astro` composes `BaseLayout`, renders persistent sidebar + `<slot />`; all five pages migrate to it.
