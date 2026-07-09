@@ -56,6 +56,36 @@ function buildBits(b: {
       agents and models, the tests, the cost — because how a thing gets built is
       half the story.
     </p>
+    <p class="projects-intro">
+      Everything here came out of the same loop: I write a spec and gate it,
+      agents build and check each other's work, I review every pull request, and
+      nothing counts until the deployed result is verified. The poster is that
+      machine on one page.
+    </p>
+
+    {/* The workflow poster — an image (not a page), so its full-size link opts
+        out of the SPA swap and opens in a new tab. */}
+    <figure class="workflow-poster">
+      <a
+        href="/work/img/agentic-programming-blueprint.webp"
+        target="_blank"
+        rel="noopener"
+        aria-label="Open the workflow poster at full size in a new tab"
+      >
+        <img
+          src="/work/img/agentic-programming-blueprint.webp"
+          width="1600"
+          height="894"
+          loading="lazy"
+          decoding="async"
+          alt="Hand-drawn poster of the agentic programming workflow: a cast of the human director/owner and the agents — Cowork the read-only verifier, Claude Code the programmer, background workers, and a scheduled-task babysitter; the eight-stage build loop drawn as a winding road with human approval gates at the PRD and engineering doc; a panel of the loop's hard-won rules; and a shared-brain table listing the artifact files and their owners."
+        />
+      </a>
+      <figcaption>
+        The method, as a poster — generated with NotebookLM from our process
+        guide, then corrected and recolored by the agents in the diagram.
+      </figcaption>
+    </figure>
 
     <div class="projects-list" id="projects-list">
       {

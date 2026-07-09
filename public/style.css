@@ -568,12 +568,49 @@ p.colophon-back a:focus-visible {
 }
 
 .projects-intro {
-    margin: 0 0 2.5rem;
+    /* 1rem between the two stacked intro paragraphs (matching the site's p+p
+       rhythm); the trailing gap before the wall is owned by .workflow-poster. */
+    margin: 0 0 1rem;
     /* Font size comes from the shared body rule above. Fills the pane like the body
        prose (42rem, matching .content section and
        .colophon p) — the old 34rem cap left a wide gap on the right and made the
        intro narrower than the cards below it. */
     max-width: 42rem;
+}
+
+/* The workflow poster: a contained figure (not full-bleed) so the first project
+   card still peeks above the fold on a laptop. The whole image is a link to the
+   full-size asset. */
+.workflow-poster {
+    margin: 1.25rem 0 2rem;
+    max-width: 29rem;
+}
+
+.workflow-poster a {
+    display: block;
+    line-height: 0;
+    border: 1px solid var(--panel-edge);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.workflow-poster a:hover,
+.workflow-poster a:focus-visible {
+    border-color: var(--ink);
+}
+
+.workflow-poster img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.workflow-poster figcaption {
+    margin-top: 0.6rem;
+    max-width: 42rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--ink-soft);
 }
 
 .projects-list {
