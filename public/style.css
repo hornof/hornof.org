@@ -974,9 +974,11 @@ p.colophon-back a:focus-visible {
 .tardis-svg {
     display: block;
     filter: drop-shadow(0 2px 4px rgba(63, 39, 22, 0.3));
-    /* Always spinning, like the Tardis materialising (reduced-motion disables
-       it via the site-wide guard). */
-    animation: tardis-spin 5s linear infinite;
+    /* V2.1: the spin is now a WAAPI animation started in MainLayout, NOT a CSS
+       `animation` — a transition:persist node restarts its CSS animation on every
+       navigation (it would jump), so the spin is WAAPI and its phase is captured
+       before a swap and resumed after (same technique as the panorama zoom).
+       Reduced motion is honored in JS (the spin isn't started). */
 }
 
 /* Tardis colours (earth palette; all in style.css per the skin rule). */
@@ -989,9 +991,8 @@ p.colophon-back a:focus-visible {
 .td-door { stroke-width: 1; }
 .td-panel { fill: none; stroke: var(--tardis-line); stroke-width: 0.8; }
 
-@keyframes tardis-spin {
-    to { transform: rotateY(360deg); }
-}
+/* (The tardis-spin @keyframes was retired in V2.1 — the spin is now a WAAPI
+   animation in MainLayout so its phase survives navigations.) */
 
 /* "Click to time travel!" — appears to the left on hover/focus. */
 .tardis-label {

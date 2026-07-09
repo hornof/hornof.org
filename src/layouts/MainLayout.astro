@@ -88,6 +88,53 @@ const { title, description, bodyClass, assetBase = "", noindex = false } =
     <slot />
   </div>
 
+  {/* Tardis time-machine — site-wide Easter egg linking the archives. V2.1: moved
+      here from index so it appears on every page. transition:persist keeps the same
+      node across navigations; the spin (WAAPI, in the script below) keeps its phase
+      so it never jumps between pages. position:fixed, so it's outside the grid. */}
+  <div class="tardis" transition:persist="tardis">
+    <button
+      type="button"
+      class="tardis-toggle"
+      aria-expanded="false"
+      aria-controls="tardis-panel"
+      aria-label="Time machine — browse earlier versions of this site"
+    >
+      <span class="tardis-label" aria-hidden="true">Click to time travel!</span>
+      <svg
+        class="tardis-svg"
+        viewBox="0 0 44 64"
+        width="40"
+        height="58"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect class="td-lamp" x="20" y="2" width="4" height="4" rx="1"></rect>
+        <rect class="td-dark" x="21" y="5" width="2" height="3"></rect>
+        <rect class="td-roof" x="9" y="6" width="26" height="3" rx="1"></rect>
+        <rect class="td-dark" x="6" y="8" width="32" height="6" rx="1"></rect>
+        <rect class="td-body" x="8" y="14" width="28" height="47"></rect>
+        <rect class="td-dark" x="8" y="14" width="28" height="5"></rect>
+        <rect class="td-window" x="11" y="22" width="9" height="9"></rect>
+        <rect class="td-window" x="24" y="22" width="9" height="9"></rect>
+        <line class="td-line" x1="15.5" y1="22" x2="15.5" y2="31"></line>
+        <line class="td-line" x1="28.5" y1="22" x2="28.5" y2="31"></line>
+        <line class="td-line" x1="11" y1="26.5" x2="20" y2="26.5"></line>
+        <line class="td-line" x1="24" y1="26.5" x2="33" y2="26.5"></line>
+        <line class="td-line td-door" x1="22" y1="19" x2="22" y2="61"></line>
+        <rect class="td-panel" x="11" y="35" width="9" height="22"></rect>
+        <rect class="td-panel" x="24" y="35" width="9" height="22"></rect>
+        <rect class="td-dark" x="6" y="60" width="32" height="3" rx="1"></rect>
+      </svg>
+    </button>
+    <ul id="tardis-panel" class="tardis-panel" hidden>
+      {/* data-astro-reload — the archives are static passthrough docs, not Astro
+          pages, so opt out of the SPA swap and do a real navigation. */}
+      <li><a href="/.2013/" data-astro-reload>2013</a></li>
+      <li><a href="/.2025/" data-astro-reload>2025</a></li>
+    </ul>
+  </div>
+
   <script>
     // V2 — sidebar nav active state, driven by astro:page-load so it runs on the
     // first load AND after every view-transition swap (module scripts don't
@@ -274,5 +321,111 @@ const { title, description, bodyClass, assetBase = "", noindex = false } =
     }
 
     document.addEventListener("astro:page-load", init);
+  </script>
+
+  <script>
+    // Tardis time-machine — site-wide (V2.1), moved from index. The .tardis node is
+    // transition:persist, so the same node carries across navigations. Two things
+    // must survive a swap:
+    //   • the spin — re-inserting a persisted node RESTARTS a CSS animation (it would
+    //     jump), so the spin is a WAAPI animation whose phase we capture before the
+    //     swap and resume after (mirrors the panorama zoom in BaseLayout), keeping it
+    //     continuous between pages;
+    //   • the click / keyboard wiring — bound so it never stacks on the persisted
+    //     node or on document across navigations.
+    (function () {
+      const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const SPIN_MS = 5000; // matches the retired `tardis-spin 5s linear` CSS
+      let spin = null;
+      let spinTime = 0; // phase (currentTime) carried across a swap
+
+      function startSpin(resumeAt) {
+        if (REDUCE.matches) return; // reduced motion: no spin (matches the CSS guard)
+        const svg = document.querySelector(".tardis-svg");
+        if (!svg || typeof svg.animate !== "function") return;
+        // Clear anything the swap's re-insertion may have stranded, so we never
+        // stack duplicate spins.
+        svg.getAnimations().forEach(function (a) {
+          a.cancel();
+        });
+        spin = svg.animate(
+          [{ transform: "rotateY(0deg)" }, { transform: "rotateY(360deg)" }],
+          { duration: SPIN_MS, iterations: Infinity, easing: "linear" }
+        );
+        if (typeof resumeAt === "number" && resumeAt > 0) {
+          try {
+            spin.currentTime = resumeAt; // pick up the pre-swap phase
+          } catch (e) {
+            /* older engines: fall back to starting from 0 */
+          }
+        }
+      }
+
+      // Interaction: click toggles the archive panel; Escape / outside-click close.
+      // The toggle click binds ONCE (guarded — the node persists, so re-running on
+      // every page-load would stack listeners); the document-level listeners tear
+      // down before re-adding (document also persists across swaps).
+      let tKeydown = null;
+      let tDocClick = null;
+      function initTardis() {
+        const toggle = document.querySelector(".tardis-toggle");
+        const panel = document.getElementById("tardis-panel");
+        if (!toggle || !panel) return;
+        function isOpen() {
+          return toggle.getAttribute("aria-expanded") === "true";
+        }
+        function open() {
+          panel.hidden = false;
+          toggle.setAttribute("aria-expanded", "true");
+        }
+        function close(returnFocus) {
+          panel.hidden = true;
+          toggle.setAttribute("aria-expanded", "false");
+          if (returnFocus) toggle.focus();
+        }
+        if (!toggle.dataset.tardisBound) {
+          toggle.addEventListener("click", function () {
+            if (isOpen()) close(false);
+            else open();
+          });
+          toggle.dataset.tardisBound = "1";
+        }
+        if (tKeydown) document.removeEventListener("keydown", tKeydown);
+        if (tDocClick) document.removeEventListener("click", tDocClick);
+        tKeydown = function (e) {
+          if (e.key === "Escape" && isOpen()) close(true);
+        };
+        tDocClick = function (e) {
+          if (isOpen() && !e.target.closest(".tardis")) close(false);
+        };
+        document.addEventListener("keydown", tKeydown);
+        document.addEventListener("click", tDocClick);
+      }
+
+      // First load: start the spin. (Interaction is wired by astro:page-load, which
+      // also fires on the first load.)
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+          startSpin();
+        });
+      } else {
+        startSpin();
+      }
+      document.addEventListener("astro:page-load", initTardis);
+      // Carry the spin phase across a swap: capture before, resume after (before the
+      // browser paints, so there's no visible jump — same as the panorama).
+      document.addEventListener("astro:before-swap", function () {
+        if (spin) {
+          try {
+            spinTime = Number(spin.currentTime) || 0;
+          } catch (e) {
+            spinTime = 0;
+          }
+        }
+      });
+      document.addEventListener("astro:after-swap", function () {
+        startSpin(spinTime);
+      });
+    })();
   </script>
 </BaseLayout>
