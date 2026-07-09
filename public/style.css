@@ -582,14 +582,17 @@ p.colophon-back a:focus-visible {
    card still peeks above the fold on a laptop. The whole image is a link to the
    full-size asset. */
 .workflow-poster {
-    /* Centered within the content column (margin auto); top/bottom unchanged so
-       the fold position holds. */
+    /* The figure spans the column so the one-line caption isn't clamped to the
+       poster's 29rem; the image itself is capped + centered below, and the
+       top/bottom margins are unchanged so the fold position holds. */
     margin: 1.25rem auto 2rem;
-    max-width: 29rem;
+    max-width: none;
 }
 
 .workflow-poster a {
     display: block;
+    max-width: 29rem;
+    margin-inline: auto;
     line-height: 0;
     border: 1px solid var(--panel-edge);
     border-radius: 12px;
