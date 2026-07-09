@@ -4,7 +4,7 @@
 // section in view; keyboard navigable; single column on mobile.
 const { test, expect } = require("@playwright/test");
 
-const SECTIONS = ["about", "experience", "publications", "talks", "projects"];
+const SECTIONS = ["vision", "publications", "talks", "projects"];
 
 test.describe("F5: sidebar layout", () => {
   test("desktop: sidebar sits left of the content and stays put on scroll", async ({

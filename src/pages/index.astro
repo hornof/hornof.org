@@ -4,11 +4,9 @@ import { getCollection } from "astro:content";
 
 // F17 (E3.1): the CV sections are data now — typed content collections rendered
 // at build time. getCollection() gives no order guarantee, so sort on the
-// authored `order`. The prose sections (About, the Projects teaser) stay inline;
-// only the list-shaped content moved to collections.
-const experience = (await getCollection("experience")).sort(
-  (a, b) => a.data.order - b.data.order
-);
+// authored `order`. The prose sections (Vision, the Projects teaser) stay inline.
+// (Experience is now told as prose inside Vision, so its collection isn't rendered
+// here — the experience/ collection stays defined but unused on this page.)
 const publications = (await getCollection("publications")).sort(
   (a, b) => a.data.order - b.data.order
 );
@@ -19,53 +17,17 @@ const talks = (await getCollection("talks")).sort(
 
 <MainLayout
   title="Luke Hornof"
-  description="Luke Hornof — AI Engineering & Leadership. Founder, researcher, and software engineer."
+  description="Luke Hornof — AI Engineering Leader. Hands-on founder, agentic engineer."
 >
   {/* V2: the sidebar now lives in MainLayout (persistent site-wide). This page
       renders only its content column into the shared shell's slot. */}
   {/* Section copy is the source in content/*.md, inlined here by hand. */}
   <main class="content">
-    <section id="about">
-      <h2>About</h2>
-      <p>
-        AI is changing how engineering teams are built and run, and the
-        companies that adapt fastest will pull ahead. The best engineering
-        leaders will combine traditional management with their own hands-on
-        agentic engineering.
-      </p>
-      <p>
-        I've built and managed engineering organizations for over a decade —
-        finding great engineers, creating a culture where they do their best
-        work, and scaling teams that consistently ship.
-      </p>
-      <p>
-        At Nervana, I founded the software team from scratch and grew it to 10
-        engineers. After the Intel acquisition, I scaled the team to 150
-        across the US, Poland, India, and Israel — without losing the quality
-        and culture that made us worth acquiring. As co-founder of Luminide, I
-        led product, engineering, and go-to-market — through acquisition by
-        Akridata. Most recently, as CTO at ThirdLaw, I built runtime safety
-        and observability for LLM and agent behavior.
-      </p>
-      <p>
-        Underneath it all: 20+ years of hands-on engineering and research, a
-        Ph.D. in CS, and published work at NeurIPS. I know how engineers think
-        because I am one — these days, an agentic one.
-      </p>
-    </section>
-
-    <section id="experience">
-      <h2>Experience</h2>
-      <ul class="cv">
-        {
-          experience.map((e) => (
-            <li>
-              <span class="cv-role">{e.data.role}, {e.data.org}</span>
-              <span class="cv-when">{e.data.when}</span><span class="cv-what">{e.data.what}</span>
-            </li>
-          ))
-        }
-      </ul>
+    <section id="vision">
+      <h2>Vision</h2>
+      <p>AI is changing how businesses are built and run, and the companies that adapt fastest will pull ahead. The best engineers will make the best agentic engineers. The best managers will make the best AI-native managers.</p>
+      <p>I've built and managed engineering organizations for over a decade — finding great engineers and creating a culture in which they thrive. At Nervana, I founded the software team, and at Intel I scaled it to 150 engineers worldwide. As co-founder of Luminide, I led product and engineering from inception to acquisition. As CTO at ThirdLaw, I built runtime safety and observability for LLM and agentic behavior.</p>
+      <p>The key to success is to take past experience, adapt it to today's rapidly changing AI-centric world, and build the best practices of tomorrow. With 20+ years of hands-on engineering and research, a Ph.D. in CS, and published work at NeurIPS, that's exactly what I'm doing.</p>
     </section>
 
     <section id="publications">

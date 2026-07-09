@@ -30,7 +30,7 @@ test.describe("V2: the sidebar renders on every route", () => {
       await expect(sidebar).toHaveAttribute("data-astro-transition-persist", /.+/);
       // The name is the home link; the section nav + socials are present.
       await expect(page.locator(".sidebar .name a")).toHaveAttribute("href", "/");
-      await expect(page.locator(".sidebar .section-nav a")).toHaveCount(5);
+      await expect(page.locator(".sidebar .section-nav a")).toHaveCount(4);
       await expect(page.locator(".sidebar nav.social a")).toHaveCount(7);
     });
   }
@@ -123,7 +123,7 @@ test.describe("V2: persistence by element identity (not looks)", () => {
 test.describe("V2: active state per route", () => {
   test("home: scroll-spy marks the first section on load", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator('.section-nav a[href="/#about"]')).toHaveAttribute(
+    await expect(page.locator('.section-nav a[href="/#vision"]')).toHaveAttribute(
       "aria-current",
       "true"
     );

@@ -33,11 +33,8 @@ test.describe("F3: minimal core content", () => {
   test("shows the tagline and the hero fragment lines", async ({ page }) => {
     await expect(page.locator(".tagline")).toHaveText(/AI Engineering Leader/i);
     const lines = page.locator(".positioning");
-    await expect(lines).toHaveCount(2);
-    await expect(lines.first()).toContainText(/Founder, researcher, agentic engineer/i);
-    await expect(lines.last()).toContainText(
-      /amazing teams, successful products, happy customers/i
-    );
+    await expect(lines).toHaveCount(1);
+    await expect(lines.first()).toContainText(/Hands-on founder, agentic engineer/i);
   });
 
   test("social row exposes exactly the named profiles", async ({ page }) => {
