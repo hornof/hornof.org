@@ -8,8 +8,10 @@ import MainLayout from "../layouts/MainLayout.astro";
   bodyClass="page-fixed"
 >
   {/* F8: colophon / transparency page. Copy source is content/built-with.md.
-      V2: shared MainLayout shell; back-link retired (sidebar nav is the path). */}
+      V2.1: shared MainLayout shell + explicit back-link to the wall it's linked
+      from (a persistent sidebar isn't a discoverable "back"). */}
   <main class="colophon">
+    <p class="colophon-back"><a href="/projects.html">← Projects</a></p>
     <h2 class="page-title">Built with</h2>
 
     <p>

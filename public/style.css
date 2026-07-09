@@ -447,7 +447,12 @@ body {
         height: calc(100vh - 2.5rem);
         overflow-y: auto;
         scroll-behavior: smooth;
-        margin: 0 auto;
+        /* margin 0, NOT `0 auto`: auto side-margins on a grid item disable stretch
+           and center the item at its *content* width — which is why the narrow
+           colophon shrank to ~610 and floated with a big gap while the wide projects
+           wall looked fine. Plain `0` lets the pane stretch to fill the column, so
+           every pane is the same width with the same gap from the sidebar. */
+        margin: 0;
     }
 }
 
@@ -485,7 +490,9 @@ p.colophon-back a:focus-visible {
 
 .colophon p {
     font-size: 1.15rem;
-    max-width: 34rem;
+    /* Match home's prose measure (.content section is 42rem) so the text fills the
+       pane instead of capping narrow and leaving a wide gap on the right. */
+    max-width: 42rem;
 }
 
 .colophon a {
@@ -513,22 +520,48 @@ p.colophon-back a:focus-visible {
 /* ---- Projects wall (F11) ---- */
 .projects {
     max-width: 44rem;
-    /* 1.25rem top/bottom so the panel gets the same breathing room off the
-       viewport edges as the colophon panels — not flush to the top and bottom. */
-    margin: 1.25rem auto;
+    /* No margin here on purpose. The shared rules own it: 1.25rem breathing room
+       on mobile (.projects,.colophon base rule), zeroed on desktop (min-width:880)
+       so the pane top lines up with the sidebar. A `margin` on this rule would sit
+       *after* the desktop override in source order and clobber it back to 1.25rem —
+       the bug that dropped the projects pane 20px below the sidebar. */
     padding: 4rem 2rem 6rem;
+}
+
+/* Desktop: every content pane fills its column, so the pane width — and the gap
+   from the sidebar — is identical on every page (the treatment home's .content
+   already uses). The per-page caps above (.colophon 40rem, .projects 44rem) then
+   apply only on mobile, where the layout stacks and a narrow reading column reads
+   better. This block sits AFTER those caps on purpose: an earlier @media rule would
+   be clobbered by the later bare `.projects { max-width }` in source order — the
+   same trap that dropped the projects pane 20px below the sidebar. */
+@media (min-width: 880px) {
+    .content,
+    .projects,
+    .colophon {
+        max-width: none;
+    }
 }
 
 .projects .page-title {
     margin: 1.5rem 0 0.75rem;
-    font-size: 1.7rem;
+    /* Match the home section headings (.content h2, 1.2rem) — the 1.7rem was
+       competing with the sidebar name/tagline. */
+    font-size: 1.2rem;
     font-weight: normal;
+    /* Uppercase + letter-spacing to match the site's other headers (sidebar name,
+       nav, home section headings, back-links). */
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
 .projects-intro {
     margin: 0 0 2.5rem;
     font-size: 1.1rem;
-    max-width: 34rem;
+    /* Fills the pane like the body prose (42rem, matching .content section and
+       .colophon p) — the old 34rem cap left a wide gap on the right and made the
+       intro narrower than the cards below it. */
+    max-width: 42rem;
 }
 
 .projects-list {
@@ -941,9 +974,11 @@ p.colophon-back a:focus-visible {
 .tardis-svg {
     display: block;
     filter: drop-shadow(0 2px 4px rgba(63, 39, 22, 0.3));
-    /* Always spinning, like the Tardis materialising (reduced-motion disables
-       it via the site-wide guard). */
-    animation: tardis-spin 5s linear infinite;
+    /* V2.1: the spin is now a WAAPI animation started in MainLayout, NOT a CSS
+       `animation` — a transition:persist node restarts its CSS animation on every
+       navigation (it would jump), so the spin is WAAPI and its phase is captured
+       before a swap and resumed after (same technique as the panorama zoom).
+       Reduced motion is honored in JS (the spin isn't started). */
 }
 
 /* Tardis colours (earth palette; all in style.css per the skin rule). */
@@ -956,9 +991,8 @@ p.colophon-back a:focus-visible {
 .td-door { stroke-width: 1; }
 .td-panel { fill: none; stroke: var(--tardis-line); stroke-width: 0.8; }
 
-@keyframes tardis-spin {
-    to { transform: rotateY(360deg); }
-}
+/* (The tardis-spin @keyframes was retired in V2.1 — the spin is now a WAAPI
+   animation in MainLayout so its phase survives navigations.) */
 
 /* "Click to time travel!" — appears to the left on hover/focus. */
 .tardis-label {

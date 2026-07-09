@@ -137,56 +137,9 @@ const talks = (await getCollection("talks")).sort(
     </footer>
   </main>
 
-  {/* Tardis time-machine: a subtle Easter-egg control linking the archives.
-      Home-only egg; position:fixed, so it sits outside the layout grid flow. */}
-  <div class="tardis">
-    <button
-      type="button"
-      class="tardis-toggle"
-      aria-expanded="false"
-      aria-controls="tardis-panel"
-      aria-label="Time machine — browse earlier versions of this site"
-    >
-      <span class="tardis-label" aria-hidden="true">Click to time travel!</span>
-      {/* Tardis (Doctor Who police box), original SVG — homage to the spinning
-          Tardis on brittanychiang.com's archive control. */}
-      <svg
-        class="tardis-svg"
-        viewBox="0 0 44 64"
-        width="40"
-        height="58"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <rect class="td-lamp" x="20" y="2" width="4" height="4" rx="1"></rect>
-        <rect class="td-dark" x="21" y="5" width="2" height="3"></rect>
-        <rect class="td-roof" x="9" y="6" width="26" height="3" rx="1"></rect>
-        <rect class="td-dark" x="6" y="8" width="32" height="6" rx="1"></rect>
-        <rect class="td-body" x="8" y="14" width="28" height="47"></rect>
-        <rect class="td-dark" x="8" y="14" width="28" height="5"></rect>
-        <rect class="td-window" x="11" y="22" width="9" height="9"></rect>
-        <rect class="td-window" x="24" y="22" width="9" height="9"></rect>
-        <line class="td-line" x1="15.5" y1="22" x2="15.5" y2="31"></line>
-        <line class="td-line" x1="28.5" y1="22" x2="28.5" y2="31"></line>
-        <line class="td-line" x1="11" y1="26.5" x2="20" y2="26.5"></line>
-        <line class="td-line" x1="24" y1="26.5" x2="33" y2="26.5"></line>
-        <line class="td-line td-door" x1="22" y1="19" x2="22" y2="61"></line>
-        <rect class="td-panel" x="11" y="35" width="9" height="22"></rect>
-        <rect class="td-panel" x="24" y="35" width="9" height="22"></rect>
-        <rect class="td-dark" x="6" y="60" width="32" height="3" rx="1"></rect>
-      </svg>
-    </button>
-    <ul id="tardis-panel" class="tardis-panel" hidden>
-      {/* F16: data-astro-reload — the archives are static passthrough docs, not
-          Astro pages, so opt out of the SPA swap and do a real navigation. */}
-      <li><a href="/.2013/" data-astro-reload>2013</a></li>
-      <li><a href="/.2025/" data-astro-reload>2025</a></li>
-    </ul>
-  </div>
-
   <script>
-    // Home-only Easter eggs: the Tardis time-machine and the Breton sign-off.
-    // (The sidebar scroll-spy / active-state moved to MainLayout in V2.)
+    // Home-only Easter egg: the Breton sign-off. (The Tardis moved to MainLayout in
+    // V2.1 so it's site-wide; the sidebar scroll-spy moved there in V2.)
     //
     // F16: under the ClientRouter these run on first load AND must re-run after a
     // view-transition swap brings the home page back (Astro doesn't re-execute
@@ -194,43 +147,6 @@ const talks = (await getCollection("talks")).sort(
     // Each disclosure keeps its document-level listeners in a module slot and
     // removes the previous pair before re-binding, so navigating away and back
     // never stacks duplicate handlers or leaves them pointing at detached nodes.
-
-    // F4: Tardis time-machine — a subtle control revealing links to the archives.
-    let tardisKeydown: ((e: KeyboardEvent) => void) | null = null;
-    let tardisDocClick: ((e: MouseEvent) => void) | null = null;
-    function initTardis() {
-      const toggle = document.querySelector(".tardis-toggle");
-      const panel = document.getElementById("tardis-panel");
-      if (!toggle || !panel) return;
-
-      function isOpen() {
-        return toggle!.getAttribute("aria-expanded") === "true";
-      }
-      function open() {
-        panel!.hidden = false;
-        toggle!.setAttribute("aria-expanded", "true");
-      }
-      function close(returnFocus: boolean) {
-        panel!.hidden = true;
-        toggle!.setAttribute("aria-expanded", "false");
-        if (returnFocus) (toggle as HTMLElement).focus();
-      }
-
-      toggle.addEventListener("click", function () {
-        if (isOpen()) close(false);
-        else open();
-      });
-      if (tardisKeydown) document.removeEventListener("keydown", tardisKeydown);
-      if (tardisDocClick) document.removeEventListener("click", tardisDocClick);
-      tardisKeydown = function (e) {
-        if (e.key === "Escape" && isOpen()) close(true);
-      };
-      tardisDocClick = function (e) {
-        if (isOpen() && !(e.target as Element).closest(".tardis")) close(false);
-      };
-      document.addEventListener("keydown", tardisKeydown);
-      document.addEventListener("click", tardisDocClick);
-    }
 
     // F9: Breton Easter egg — a faint fleur-de-lis revealing a nod to Brittany.
     // Same disclosure pattern as the Tardis (open/close, Escape, outside-click).
@@ -271,7 +187,6 @@ const talks = (await getCollection("talks")).sort(
     }
 
     function initEggs() {
-      initTardis();
       initBreton();
     }
 

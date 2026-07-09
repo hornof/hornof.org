@@ -64,13 +64,15 @@ test.describe("F8: the page itself", () => {
     }
   });
 
-  test("offers a way back into the site via the persistent sidebar", async ({ page }) => {
-    // V2: the per-page "← Projects" back-link retired. The persistent sidebar is
-    // the site-wide nav now — its name links home and its Projects section link
-    // (marked current on this Projects-area page) leads back to the wall.
+  test("offers a way back into the site: an explicit back-link plus the sidebar nav", async ({ page }) => {
+    // V2.1: the "← Projects" back-link is restored — the sidebar name alone wasn't a
+    // discoverable way back. The persistent sidebar is still the site-wide nav too.
     const sidebar = page.locator(".sidebar");
     await expect(sidebar).toBeVisible();
-    await expect(page.locator(".colophon-back")).toHaveCount(0);
+    const back = page.locator(".colophon-back a");
+    await expect(back).toHaveCount(1);
+    await expect(back).toContainText("Projects");
+    await expect(back).toHaveAttribute("href", "/projects.html");
     const home = page.locator(".sidebar .name a");
     await expect(home).toHaveAttribute("href", "/");
     const projects = page.locator('.sidebar .section-nav a[href="/#projects"]');
