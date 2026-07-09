@@ -34,7 +34,7 @@ test.describe("F3: minimal core content", () => {
     await expect(page.locator(".tagline")).toHaveText(/AI Engineering Leader/i);
     const lines = page.locator(".positioning");
     await expect(lines).toHaveCount(1);
-    await expect(lines.first()).toContainText(/Hands-on founder, researcher, agentic engineer/i);
+    await expect(lines.first()).toContainText(/Hands-on founder, agentic engineer/i);
   });
 
   test("social row exposes exactly the named profiles", async ({ page }) => {
