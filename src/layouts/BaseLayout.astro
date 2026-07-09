@@ -63,6 +63,24 @@ const asset = (p: string) => `${assetBase}${p}`;
         }
       })();
     </script>
+    <!-- Cloudflare Web Analytics (cookie-less RUM). Hostname-guarded so
+         localhost dev and Playwright runs never count as visitors — the
+         GA tag in the 2025 archive taught us that lesson (416 "users"
+         that were all the test suite). Loads only on the real domain. -->
+    <script is:inline>
+      (() => {
+        const h = location.hostname;
+        if (h !== "hornof.org" && h !== "www.hornof.org") return;
+        const s = document.createElement("script");
+        s.defer = true;
+        s.src = "https://static.cloudflareinsights.com/beacon.min.js";
+        s.setAttribute(
+          "data-cf-beacon",
+          '{"token": "bb126dae66e7408787e9c28001b6c3d5"}'
+        );
+        document.head.appendChild(s);
+      })();
+    </script>
   </head>
   <body class={bodyClass}>
     {/* F16: the panorama + palette scrim as real, persisted elements. Marking
