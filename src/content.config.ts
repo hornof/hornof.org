@@ -37,7 +37,7 @@ const projects = defineCollection({
         stack: z.string().optional(),
         agents: z.string().optional(),
         models: z.string().optional(),
-        tests: z.number().optional(),
+        tests: z.union([z.number(), z.string()]).optional(),
         firstPassGreen: z.union([z.string(), z.boolean()]).optional(),
         costNote: z.string().optional(),
       })

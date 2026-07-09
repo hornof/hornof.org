@@ -146,8 +146,8 @@ test.describe("F12: dogfood entry", () => {
     for (const term of ["html", "cloudflare", "claude code"]) {
       expect(build, `build-note mentions ${term}`).toContain(term);
     }
-    // A real test count, not a stub.
-    expect(build).toMatch(/\d+\s*tests/);
+    // A real test count, not a stub (allows the drift-proof "120+ tests").
+    expect(build).toMatch(/\d+\+?\s*tests/);
   });
 
   test("no invented placeholder metrics", async ({ page }) => {
