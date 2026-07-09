@@ -337,21 +337,37 @@ body {
 /* Section headings echo the sidebar's uppercase labels: the caps carry the
    emphasis, so the size stays close to body copy (1.15rem) — just a hair
    larger — instead of competing with the name and tagline in the sidebar. */
-.content h2 {
-    margin: 0 0 1rem;
+/* One shared section-heading treatment — small-caps, letterspaced, 1.2rem — used by
+   home sections, the Projects title, and the colophon page titles + subheadings, so
+   no page drifts into its own heading size/case. Margins stay per-context. */
+.content h2,
+.projects .page-title,
+.colophon .page-title,
+.colophon h2 {
     font-size: 1.2rem;
     font-weight: normal;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
 
+.content h2 {
+    margin: 0 0 1rem;
+}
+
 /* Paragraphs and list items inherit the section's single measure (42rem)
    rather than each carrying a tighter cap — otherwise headings, lists, and
    paragraphs stop at three different right edges inside the wide content
    pane, giving a ragged right margin that floats far from the pane edge. */
+/* One shared body size for the long-form prose (home sections + colophon pages) so
+   the reading text doesn't drift page to page. (Measured: both were 18.4px; the
+   site's 17.6px "body" was only the Projects intro — normalized to 17.6 here.) */
+.content section p,
+.colophon p {
+    font-size: 1.1rem;
+}
+
 .content section p {
     margin: 0;
-    font-size: 1.15rem;
 }
 
 /* Separate stacked paragraphs (the About bio, the Projects intro + its link).
@@ -483,21 +499,18 @@ p.colophon-back a:focus-visible {
    own title is an h2.page-title styled to match the old h1 — so the page reads
    the same, but the document has exactly one h1 (the persistent identity). */
 .colophon .page-title {
+    /* Font treatment from the shared section-heading rule; page-title margin only. */
     margin: 1.5rem 0 1.5rem;
-    font-size: 1.7rem;
-    font-weight: normal;
 }
 
 .colophon h2 {
+    /* Font from the shared section-heading rule; subheading margin only. */
     margin: 2.25rem 0 0.75rem;
-    font-size: 1.25rem;
-    font-weight: normal;
 }
 
 .colophon p {
-    font-size: 1.15rem;
-    /* Match home's prose measure (.content section is 42rem) so the text fills the
-       pane instead of capping narrow and leaving a wide gap on the right. */
+    /* Font size from the shared body rule; keep the reading measure — match home's
+       prose measure (42rem) so the text fills the pane instead of capping narrow. */
     max-width: 42rem;
 }
 
@@ -550,15 +563,8 @@ p.colophon-back a:focus-visible {
 }
 
 .projects .page-title {
+    /* Font from the shared section-heading rule; margin only. */
     margin: 1.5rem 0 0.75rem;
-    /* Match the home section headings (.content h2, 1.2rem) — the 1.7rem was
-       competing with the sidebar name/tagline. */
-    font-size: 1.2rem;
-    font-weight: normal;
-    /* Uppercase + letter-spacing to match the site's other headers (sidebar name,
-       nav, home section headings, back-links). */
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
 }
 
 .projects-intro {
