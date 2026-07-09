@@ -1,4 +1,4 @@
 source: https://github.com/hornof/eclipse-sim
 commit: 6ffa1ee
-synced: 2026-07-07T23:52Z
+synced: 2026-07-09T01:36Z
 rule: deploy artifact — do not edit; run scripts/sync-projects.sh
