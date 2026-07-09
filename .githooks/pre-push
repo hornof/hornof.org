@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+#
+# pre-push — mechanical /gitstate.
+#
+# Fetches origin, then BLOCKS the push when the current branch is unsafe to push to:
+#   1. its PR is already MERGED  → never add commits to a merged branch
+#   2. it is behind origin/main  → stale; rebase first so it merges clean and is
+#                                  tested against the current main
+#
+# This makes "verify state before pushing" mechanical instead of memory-dependent.
+#
+# Overrides:
+#   GITSTATE_ALLOW_STALE=1 git push …   push a behind-main branch on purpose
+#   git push --no-verify                skip this guard entirely (use sparingly)
+#
+set -uo pipefail
+
+branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo)"
+if [ -z "$branch" ] || [ "$branch" = "HEAD" ]; then exit 0; fi   # detached: nothing to guard
+if [ "$branch" = "main" ]; then exit 0; fi                       # pushing main itself: allow
+
+echo "gitstate: checking origin before push…"
+git fetch --quiet origin main 2>/dev/null || true
+
+block() {
+  echo ""
+  echo "  ✗ PUSH BLOCKED — $1"
+  echo "    $2"
+  echo "    (bypass: git push --no-verify)"
+  echo ""
+  exit 1
+}
+
+# 1) Is this branch's PR already merged?
+if command -v gh >/dev/null 2>&1; then
+  state="$(gh pr view "$branch" --json state --jq .state 2>/dev/null || echo)"
+  if [ "$state" = "MERGED" ]; then
+    block "the PR for '$branch' is already MERGED." \
+          "Branch off main for new work; don't add commits to a merged branch."
+  fi
+fi
+
+# 2) Is the branch stale (behind origin/main)?
+if git rev-parse --verify -q origin/main >/dev/null 2>&1; then
+  behind="$(git rev-list --count HEAD..origin/main 2>/dev/null || echo 0)"
+  if [ "${behind:-0}" -gt 0 ] && [ "${GITSTATE_ALLOW_STALE:-0}" != "1" ]; then
+    block "'$branch' is $behind commit(s) behind origin/main (stale)." \
+          "Rebase first:  git rebase origin/main && npm test   (or set GITSTATE_ALLOW_STALE=1)."
+  fi
+fi
+
+ahead="$(git rev-list --count origin/main..HEAD 2>/dev/null || echo '?')"
+echo "  ✓ gitstate ok — '$branch' is unmerged and current with main ($ahead ahead)."
+exit 0
