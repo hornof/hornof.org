@@ -198,8 +198,10 @@ body {
 
 .name {
     margin: 0;
-    font-size: 1.15rem;
-    font-weight: normal;
+    /* The name owns the identity card: a tier above the tagline (1.7rem), same
+       small-caps treatment, a touch heavier — so it reads as identity, not a label. */
+    font-size: 1.75rem;
+    font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
@@ -249,7 +251,11 @@ body {
     width: max-content;
     color: var(--ink-soft);
     text-decoration: none;
-    font-size: 0.8rem;
+    /* Quieter than the name and headings so the hierarchy reads name > headings >
+       nav. Opacity dims the resting and active states together, keeping the active
+       link's contrast against the rest. */
+    font-size: 0.72rem;
+    opacity: 0.78;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     transition: color 0.2s ease;
