@@ -11,7 +11,7 @@ test.describe("F6: real section content", () => {
   });
 
   test("every section has a heading and real body copy", async ({ page }) => {
-    for (const id of ["about", "experience", "publications", "talks", "projects"]) {
+    for (const id of ["vision", "publications", "talks", "projects"]) {
       const section = page.locator(`#${id}`);
       await expect(section.locator("h2")).toBeVisible();
       const text = (await section.innerText()).trim();
@@ -34,11 +34,13 @@ test.describe("F6: real section content", () => {
     }
   });
 
-  test("experience lists real, specific roles", async ({ page }) => {
-    const roles = page.locator("#experience .cv li");
-    await expect(roles).toHaveCount(7);
-    await expect(page.getByText(/CTO, ThirdLaw/)).toBeVisible();
-    await expect(page.getByText(/10 to 150 across four countries/)).toBeVisible();
+  test("the Vision section carries real, specific experience as prose", async ({ page }) => {
+    // Experience is now narrative inside Vision — assert the real, checkable
+    // specifics survived the move from a CV list to prose.
+    const text = (await page.locator("#vision").innerText()).replace(/\s+/g, " ");
+    for (const fact of ["Nervana", "Intel", "150 engineers", "Luminide", "ThirdLaw", "NeurIPS", "Ph.D."]) {
+      expect(text, `Vision should mention "${fact}"`).toContain(fact);
+    }
   });
 });
 
