@@ -10,8 +10,8 @@ const path = require("path");
 
 const DIST = path.join(__dirname, "..", "dist");
 const TARGETS = [
-  ".2013/index.html",
-  ".2025/index.html",
+  "2013-archive/index.html",
+  "2025-archive/index.html",
   "projects/eclipse/index.html",
   "projects/eclipse/PROVENANCE.txt",
 ];
@@ -35,7 +35,7 @@ test.describe("F14: archives + eclipse pass through the Astro build", () => {
   }
 
   test("the 2013 archive keeps its real markup", () => {
-    const html = fs.readFileSync(path.join(DIST, ".2013/index.html"), "utf8");
+    const html = fs.readFileSync(path.join(DIST, "2013-archive/index.html"), "utf8");
     expect(html).toMatch(/Luke Hornof/i);
   });
 });

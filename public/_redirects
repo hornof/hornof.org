@@ -1,0 +1,4 @@
+# Archives moved off dot-prefixed folders (V4/Q3, 2026-07-08). 301 permanent so
+# any external/Wayback inbound links to the old canonical URLs still resolve.
+/.2013/* /2013-archive/:splat 301
+/.2025/* /2025-archive/:splat 301

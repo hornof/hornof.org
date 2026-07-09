@@ -4,7 +4,7 @@
 // the three archives; all archives reachable via it; keyboard accessible.
 const { test, expect } = require("@playwright/test");
 
-const ARCHIVES = ["/.2013/", "/.2025/"];
+const ARCHIVES = ["/2013-archive/", "/2025-archive/"];
 const ALL_PAGES = [
   "/",
   "/projects.html",

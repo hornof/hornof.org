@@ -73,22 +73,17 @@ serif "LUKE HORNOF" card), not the old site.
 
 ### 3. Check the archives serve on the preview URL
 
-The archives live in dot-prefixed folders (`.2013 .2025`). Some static
-hosts hide dot-folders. Test both on the **preview** URL (swap in your real
-`*.pages.dev` host):
+The archives live at `/2013-archive/` and `/2025-archive/` (non-dot folders). Test
+both on the **preview** URL (swap in your real `*.pages.dev` host):
 
 ```
-https://hornof-org.pages.dev/.2013/
-https://hornof-org.pages.dev/.2025/
+https://hornof-org.pages.dev/2013-archive/
+https://hornof-org.pages.dev/2025-archive/
 ```
 
-**Verify —** each loads an old-site snapshot (HTTP 200), not a 404.
-
-- **If all three load:** nothing to do — skip to Part 2.
-- **If any 404s:** Cloudflare is hiding the dot-folders. Apply the fallback in
-  [Appendix A](#appendix-a--if-the-archives-dont-serve) now, let it redeploy,
-  then re-run this step until all three load. Do **not** proceed to cutover with
-  broken archives.
+**Verify —** each loads an old-site snapshot (HTTP 200), not a 404. Also spot-check
+that an old URL still redirects: `https://hornof-org.pages.dev/.2013/` should **301**
+to `/2013-archive/` (via `public/_redirects`).
 
 ---
 
@@ -195,7 +190,7 @@ Give it a couple of minutes (TTL is 300 now), then check the real domain:
 
 - <https://hornof.org> → the **new** one-pager, over **https**, no cert warning.
 - <https://www.hornof.org> → resolves to the same site.
-- <https://hornof.org/.2013/>, `/.2025/` → each archive loads.
+- <https://hornof.org/2013-archive/>, `/2025-archive/` → each archive loads.
 
 **Verify —** all of the above load correctly. From a terminal:
 
@@ -242,40 +237,13 @@ after cutover — it's your rollback target. The archives and the old page at
 
 ---
 
-## Appendix A — if the archives don't serve
+## Appendix A — archives (obsolete)
 
-Only needed if Step 3 showed a 404 for any `/.YYYY/` path (Cloudflare hiding the
-dot-folders). This copies the archives to dot-free folders **at deploy time**
-(the on-disk `.2013/.2025` are never renamed) and rewrites the pretty URLs
-onto them.
-
-> Note: this adds a one-line deploy copy — a small exception to the repo's
-> "no build step" rule, taken only if the host forces it. The `/.2013/` URLs
-> stay the canonical, working paths.
-
-1. In the Pages project → **Settings → Builds & deployments → Build command**,
-   set:
-
-   ```
-   for d in .2013 .2025; do cp -r "$d" "${d#.}"; done
-   ```
-
-   (Leave the output directory as `/`.)
-
-2. Add a file named **`_redirects`** at the repo root with:
-
-   ```
-   /.2013/* /2013/:splat 200
-   /.2025/* /2025/:splat 200
-   ```
-
-   The `200` makes these **rewrites**, not redirects: the browser URL stays
-   `/.2013/…` while Cloudflare serves the copied `2013/…` files.
-
-3. Commit `_redirects`, push to `main`, and let Pages redeploy.
-
-**Verify —** re-run Step 3: `https://<project>.pages.dev/.2013/` (and
-`.2025`) now load. Then continue the runbook.
+Retired 2026-07 (V4/Q3). The archives were renamed off the dot-prefixed folders to
+`/2013-archive/` and `/2025-archive/`, with **301** redirects from the old
+`/.2013/ /.2025/` URLs in `public/_redirects`. So the "does Cloudflare serve
+dot-dirs" question no longer applies, and the deploy-time copy fallback this
+appendix used to describe is no longer needed.
 
 ---
 
