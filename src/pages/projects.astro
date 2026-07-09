@@ -28,13 +28,13 @@ const isEclipseRun = (href: string) => /(^|\/)projects\/eclipse\/?$/.test(href);
 function buildBits(b: {
   stack?: string;
   agents?: string;
-  tests?: number;
+  tests?: number | string;
   firstPassGreen?: string | boolean;
 }) {
   const bits: string[] = [];
   if (b.stack) bits.push(b.stack);
   if (b.agents) bits.push(b.agents);
-  if (typeof b.tests === "number") bits.push(b.tests + " tests");
+  if (b.tests != null) bits.push(b.tests + " tests");
   if (b.firstPassGreen) bits.push("first-pass green: " + b.firstPassGreen);
   return bits;
 }

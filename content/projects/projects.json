@@ -22,7 +22,7 @@
       "stack": "Astro · static HTML · content collections · one style.css · Cloudflare Pages",
       "agents": "Claude Code",
       "models": "Opus 4.8",
-      "tests": 74,
+      "tests": "120+",
       "firstPassGreen": "mostly — human review caught the rest",
       "costNote": "Tests written before code; every feature landed as its own reviewed PR, none straight to main."
     }
