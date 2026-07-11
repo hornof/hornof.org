@@ -28,6 +28,14 @@ const {
 } = Astro.props;
 
 const asset = (p: string) => `${assetBase}${p}`;
+
+// Open Graph / share-card metadata: what iMessage, Slack, LinkedIn, X, etc.
+// render when someone pastes a link to this site. Absolute URLs required.
+const ogDescription =
+  description ??
+  "Hands-on founder, agentic engineer. Projects built end-to-end with a managed agent pipeline, plus publications and talks.";
+const ogUrl = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL("/work/img/og-card.jpg", Astro.site).href;
 ---
 
 <!doctype html>
@@ -38,6 +46,15 @@ const asset = (p: string) => `${assetBase}${p}`;
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Luke Hornof" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={ogUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="628" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={asset("work/img/LH-icon.ico")} type="image/x-icon" />
     <link rel="stylesheet" href={asset("style.css")} />
     {/* F16: cross-document view transitions. Internal Astro pages swap in place
@@ -71,6 +88,14 @@ const asset = (p: string) => `${assetBase}${p}`;
       (() => {
         const h = location.hostname;
         if (h !== "hornof.org" && h !== "www.hornof.org") return;
+        // Self-exclusion: visit ?noanalytics=1 once per browser to opt that
+        // browser out forever (Luke's own visits); ?analytics=1 re-enables.
+        try {
+          const q = new URLSearchParams(location.search);
+          if (q.get("noanalytics") === "1") localStorage.setItem("noanalytics", "1");
+          if (q.get("analytics") === "1") localStorage.removeItem("noanalytics");
+          if (localStorage.getItem("noanalytics") === "1") return;
+        } catch (e) {}
         const s = document.createElement("script");
         s.defer = true;
         s.src = "https://static.cloudflareinsights.com/beacon.min.js";
