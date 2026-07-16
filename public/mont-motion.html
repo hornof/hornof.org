@@ -38,6 +38,14 @@
   .line{overflow:hidden}
   .line .t{display:block;transform:translateY(112%);opacity:0;will-change:transform,opacity}
 
+  /* the opening reveal: pure CSS, fires as soon as the page is visible — no JS frames needed */
+  @keyframes rise{to{transform:translateY(0);opacity:1}}
+  #ch1 .line:nth-child(1) .t{animation:rise 1.05s cubic-bezier(.16,.6,.35,1) .25s forwards}
+  #ch1 .line:nth-child(2) .t{animation:rise 1.05s cubic-bezier(.16,.6,.35,1) .40s forwards}
+  #ch1 .line:nth-child(3) .t{animation:rise 1.05s cubic-bezier(.16,.6,.35,1) .55s forwards}
+  /* once scrolling begins, JS takes over ch1 lines */
+  #ch1.js .line .t{animation:none}
+
   h1{font-size:clamp(2.4rem,6.2vw,5.2rem);font-weight:500;letter-spacing:.14em;
     text-transform:uppercase;line-height:1.08}
   .kicker{font-size:clamp(.8rem,1.2vw,.95rem);letter-spacing:.42em;
@@ -58,7 +66,7 @@
   #foot a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(239,230,214,.45);
     padding-bottom:2px}
   @media (prefers-reduced-motion: reduce){
-    #depth{height:100vh} .line .t{transform:none!important;opacity:1!important}
+    #depth{height:100vh} .line .t{transform:none!important;opacity:1!important;animation:none!important}
   }
 </style>
 </head>
@@ -114,13 +122,11 @@
   const foot=document.getElementById('foot');
 
   const chapters=[
-    {el:document.getElementById('ch1'), a:0.00,b:0.06, c:0.18,d:0.28, intro:true},
+    {el:document.getElementById('ch1'), a:-0.01,b:0.0,  c:0.16,d:0.26, css:true},
     {el:document.getElementById('ch2'), a:0.56,b:0.66, c:0.76,d:0.84},
     {el:document.getElementById('ch3'), a:0.86,b:0.96, c:1.01,d:1.02}
   ];
   chapters.forEach(ch=>{ch.lines=[...ch.el.querySelectorAll('.line .t')];});
-
-  let introT0=-1;
 
   function pose(p,t){
     const drift=6*Math.sin(t/6000), drift2=4*Math.sin(t/9000+2);
@@ -140,9 +146,13 @@
     for(const ch of chapters){
       const outA=1-win(p,ch.c,ch.d);
       ch.el.style.opacity=String(Math.min(1,outA*1.2));
+      if(ch.css){
+        // ch1: CSS animation owns the entrance; JS takes over only once we leave rest
+        if(p<0.015){ ch.el.classList.remove('js'); ch.lines.forEach(ln=>{ln.style.opacity='';ln.style.transform='';}); continue; }
+        ch.el.classList.add('js');
+      }
       ch.lines.forEach((ln,i)=>{
-        const la = ch.intro ? clamp(((t-introT0)/1400)*1.6-i*0.22,0,1)
-                            : win(p, ch.a+i*0.025, ch.b+i*0.025);
+        const la = ch.css ? 1 : win(p, ch.a+i*0.025, ch.b+i*0.025);
         const k=easeOut(Math.min(la,outA));
         ln.style.opacity=String(k);
         ln.style.transform=`translateY(${(1-k)*112}%)`;
@@ -153,12 +163,9 @@
     foot.style.opacity=String(win(p,0.90,0.97));
   }
 
-  // frame-rate-independent glide: time-based exponential approach.
-  // tau = 350ms gives the weighty mont-fort lag at any fps, throttled or not.
   let target=0, smooth=0, last=0;
   addEventListener('scroll',()=>{target=scrollY/(document.body.scrollHeight-innerHeight);},{passive:true});
   function frame(t){
-    if(introT0<0 && t>350) introT0=t;
     const dt=Math.min(200,t-last)||16; last=t;
     const k=1-Math.exp(-dt/350);
     smooth+=(target-smooth)*k;
@@ -167,6 +174,9 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+
+  // dev-only deterministic hook for the navigator's audit (strip before merge)
+  window.__pose=(p)=>{smooth=p;target=p;pose(p,performance.now());return p;};
 })();
 </script>
 </body>
