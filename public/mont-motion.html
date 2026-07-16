@@ -113,8 +113,6 @@
   const cue=document.getElementById('cue');
   const foot=document.getElementById('foot');
 
-  // chapters: [element, enterStart, enterEnd, exitStart, exitEnd]
-  // line reveals are scrubbed inside the enter window, staggered per line.
   const chapters=[
     {el:document.getElementById('ch1'), a:0.00,b:0.06, c:0.18,d:0.28, intro:true},
     {el:document.getElementById('ch2'), a:0.56,b:0.66, c:0.76,d:0.84},
@@ -122,7 +120,7 @@
   ];
   chapters.forEach(ch=>{ch.lines=[...ch.el.querySelectorAll('.line .t')];});
 
-  let introDone=false, introT0=0;
+  let introT0=-1;
 
   function pose(p,t){
     const drift=6*Math.sin(t/6000), drift2=4*Math.sin(t/9000+2);
@@ -140,13 +138,10 @@
     h2z.style.transform=`translate3d(${drift}px,${(10-120*e)}vh,0)`;
 
     for(const ch of chapters){
-      // chapter alpha: in during [a,b], out during [c,d]
-      const inA = ch.intro ? introAlpha(t) : win(p,ch.a,ch.b);
-      const outA = 1-win(p,ch.c,ch.d);
+      const outA=1-win(p,ch.c,ch.d);
       ch.el.style.opacity=String(Math.min(1,outA*1.2));
       ch.lines.forEach((ln,i)=>{
-        // each line's own scrubbed window, staggered
-        const la = ch.intro ? clamp(inA*1.6-i*0.22,0,1)
+        const la = ch.intro ? clamp(((t-introT0)/1400)*1.6-i*0.22,0,1)
                             : win(p, ch.a+i*0.025, ch.b+i*0.025);
         const k=easeOut(Math.min(la,outA));
         ln.style.opacity=String(k);
@@ -157,16 +152,16 @@
     cue.style.opacity=String(1-win(p,0.02,0.10));
     foot.style.opacity=String(win(p,0.90,0.97));
   }
-  function introAlpha(t){
-    if(!introDone) return 0;
-    return clamp((t-introT0)/1400,0,1);
-  }
 
-  let target=0, smooth=0;
+  // frame-rate-independent glide: time-based exponential approach.
+  // tau = 350ms gives the weighty mont-fort lag at any fps, throttled or not.
+  let target=0, smooth=0, last=0;
   addEventListener('scroll',()=>{target=scrollY/(document.body.scrollHeight-innerHeight);},{passive:true});
   function frame(t){
-    if(introDone===false && t>400){introDone=true;introT0=t;}
-    smooth += (target-smooth)*0.065;
+    if(introT0<0 && t>350) introT0=t;
+    const dt=Math.min(200,t-last)||16; last=t;
+    const k=1-Math.exp(-dt/350);
+    smooth+=(target-smooth)*k;
     if(Math.abs(target-smooth)<1e-5) smooth=target;
     pose(smooth,t);
     requestAnimationFrame(frame);
